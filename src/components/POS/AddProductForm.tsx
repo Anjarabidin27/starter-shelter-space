@@ -5,9 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Scan } from 'lucide-react';
 import { Product } from '@/types/pos';
 import { QuantitySelector } from './QuantitySelector';
+import { toast } from 'sonner';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Capacitor } from '@capacitor/core';
 
 interface AddProductFormProps {
   onAddProduct: (product: Omit<Product, 'id'>) => void;
@@ -16,7 +19,7 @@ interface AddProductFormProps {
   onClose: () => void;
 }
 
-export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], onClose }: AddProductFormProps) => {
+export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], onClose }: AddProductFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     costPrice: '',
@@ -32,6 +35,7 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
+  const [isScanning, setIsScanning] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,6 +151,73 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
     setSuggestions([]);
   };
 
+  const handleScanBarcode = async () => {
+    try {
+      if (!Capacitor.isNativePlatform()) {
+        toast.error('Barcode scanner hanya tersedia di aplikasi mobile');
+        return;
+      }
+
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      if (!status.granted) {
+        toast.error('Izin kamera diperlukan untuk scan barcode');
+        return;
+      }
+
+      setIsScanning(true);
+      document.body.classList.add('scanner-active');
+      await BarcodeScanner.hideBackground();
+
+      const result = await BarcodeScanner.startScan();
+
+      document.body.classList.remove('scanner-active');
+      await BarcodeScanner.showBackground();
+      setIsScanning(false);
+
+      if (result.hasContent) {
+        const scannedCode = result.content;
+        const foundProduct = products.find(p => 
+          p.barcode === scannedCode || p.code === scannedCode
+        );
+
+        if (foundProduct) {
+          // Found existing product - fill form for stock update
+          setFormData({
+            name: foundProduct.name,
+            costPrice: foundProduct.costPrice.toString(),
+            sellPrice: foundProduct.sellPrice.toString(),
+            stock: '',
+            category: foundProduct.category || '',
+            code: foundProduct.code || '',
+            barcode: foundProduct.barcode || '',
+            isPhotocopy: foundProduct.isPhotocopy || false,
+          });
+          toast.success(`Produk ditemukan: ${foundProduct.name}. Masukkan jumlah stok.`);
+        } else {
+          // New product - set barcode and let user fill details
+          setFormData(prev => ({
+            ...prev,
+            barcode: scannedCode,
+          }));
+          toast.success(`Barcode discan: ${scannedCode}. Lengkapi data produk.`);
+        }
+      }
+    } catch (error) {
+      console.error('Barcode scan error:', error);
+      document.body.classList.remove('scanner-active');
+      await BarcodeScanner.showBackground();
+      setIsScanning(false);
+      toast.error('Gagal scan barcode');
+    }
+  };
+
+  const stopScanning = async () => {
+    await BarcodeScanner.stopScan();
+    document.body.classList.remove('scanner-active');
+    await BarcodeScanner.showBackground();
+    setIsScanning(false);
+  };
+
   return (
     <Card className="pos-card">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -154,9 +225,14 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
           <Plus className="h-5 w-5" />
           Tambah Produk/Layanan Baru
         </CardTitle>
-        <Button variant="ghost" size="sm" onClick={onClose}>
-          <X className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleScanBarcode} disabled={isScanning}>
+            <Scan className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
       
       <CardContent>
@@ -388,6 +464,20 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
           </TabsContent>
         </Tabs>
       </CardContent>
+
+      {isScanning && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
+          <div className="text-white text-center mb-8">
+            <p className="text-xl mb-2">Arahkan kamera ke barcode</p>
+            <p className="text-sm text-gray-400">Barcode akan otomatis terdeteksi</p>
+          </div>
+          <div className="absolute bottom-8">
+            <Button onClick={stopScanning} variant="outline" size="lg">
+              Batal
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   );
-};
+}

@@ -9,10 +9,8 @@ import {
   LazyReceipt,
   LazyAddProductForm,
   LazySalesReport,
-  LazyManualReceiptReport,
   LazyStockManagement,
   LazyReceiptHistory,
-  LazyManualInvoice,
   LazyQuickInvoice,
   LazyShoppingList,
   LazyBluetoothManager,
@@ -493,18 +491,6 @@ Profit: ${formatPrice(receipt.profit)}
               </div>
             </CardContent>
           </Card>
-          
-          <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setCurrentTab('manual-reports')}>
-            <CardContent className="flex items-center p-4">
-              <Package className="h-8 w-8 text-warning mr-3" />
-              <div>
-                <div className="text-2xl font-bold text-warning">
-                  {formatPrice(todayManualRevenue)}
-                </div>
-                <div className="text-sm text-muted-foreground">Pendapatan Manual</div>
-              </div>
-            </CardContent>
-          </Card>
 
           <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleDashboardClick('stock')}>
             <CardContent className="flex items-center p-4">
@@ -542,9 +528,6 @@ Profit: ${formatPrice(receipt.profit)}
             </TabsTrigger>
             <TabsTrigger value="reports" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
               Laporan
-            </TabsTrigger>
-            <TabsTrigger value="manual-reports" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
-              Laporan Manual
             </TabsTrigger>
             <TabsTrigger value="admin" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
               Admin
@@ -796,19 +779,8 @@ Profit: ${formatPrice(receipt.profit)}
           <TabsContent value="reports" className="space-y-4">
             <Suspense fallback={<ComponentLoader />}>
               <LazySalesReport 
-                receipts={receipts.filter(receipt => !receipt.isManual && !receipt.id.startsWith('MNL-'))} 
+                receipts={receipts.filter(receipt => !receipt.isManual && !receipt.id.startsWith('MNL-') && !receipt.id.startsWith('QCK-'))} 
                 formatPrice={formatPrice}
-              />
-            </Suspense>
-          </TabsContent>
-
-          <TabsContent value="manual-reports" className="space-y-2 sm:space-y-4 mt-2 sm:mt-4">
-            <Suspense fallback={<ComponentLoader />}>
-              <LazyManualReceiptReport 
-                receipts={receipts} 
-                formatPrice={formatPrice}
-                onViewReceipt={handleViewReceipt}
-                onPrintReceipt={handlePrintThermal}
               />
             </Suspense>
           </TabsContent>

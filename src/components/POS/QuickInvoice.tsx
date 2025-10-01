@@ -52,7 +52,10 @@ export const QuickInvoice = ({ onCreateInvoice, formatPrice, receipts, onPrintRe
   };
 
   const handleAddItem = () => {
-    if (!selectedProduct) return;
+    if (!selectedProduct || quantity <= 0) {
+      toast.error('Jumlah harus lebih dari 0');
+      return;
+    }
 
     const existingItemIndex = items.findIndex(item => item.product.id === selectedProduct.id);
     
@@ -73,7 +76,7 @@ export const QuickInvoice = ({ onCreateInvoice, formatPrice, receipts, onPrintRe
     }
 
     setSelectedProduct(null);
-    setQuantity(1);
+    setQuantity(0);
     searchInputRef.current?.focus();
   };
 
@@ -251,27 +254,47 @@ export const QuickInvoice = ({ onCreateInvoice, formatPrice, receipts, onPrintRe
 
           {/* Selected Product & Quantity */}
           {selectedProduct && (
-            <div className="p-3 bg-muted rounded-md space-y-3">
+            <div className="p-4 bg-primary/5 border-2 border-primary/20 rounded-lg space-y-3">
               <div>
-                <div className="font-medium text-sm">{selectedProduct.name}</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="font-semibold text-base">{selectedProduct.name}</div>
+                <div className="text-sm text-muted-foreground">
                   {formatPrice(selectedProduct.sellPrice)} | Stok: {selectedProduct.stock}
                 </div>
               </div>
-              <div className="flex gap-2 items-end">
+              <div className="flex gap-2 items-center">
                 <div className="flex-1">
-                  <Label htmlFor="quantity" className="text-xs">Jumlah</Label>
-                  <Input
-                    id="quantity"
-                    type="number"
-                    min="1"
-                    value={quantity}
-                    onChange={(e) => setQuantity(Number(e.target.value) || 1)}
-                    className="h-9 text-sm"
-                  />
+                  <Label htmlFor="quantity" className="text-sm font-medium">Jumlah</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuantity(Math.max(0, quantity - 1))}
+                      className="h-10 w-10 p-0"
+                    >
+                      -
+                    </Button>
+                    <Input
+                      id="quantity"
+                      type="number"
+                      min="0"
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.max(0, Number(e.target.value) || 0))}
+                      className="h-10 text-center text-base font-semibold"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="h-10 w-10 p-0"
+                    >
+                      +
+                    </Button>
+                  </div>
                 </div>
-                <Button onClick={handleAddItem} size="sm" className="h-9">
-                  <Plus className="h-4 w-4 mr-1" />
+                <Button onClick={handleAddItem} size="lg" className="h-10 mt-6">
+                  <Plus className="h-5 w-5 mr-1" />
                   Tambah
                 </Button>
               </div>
@@ -280,14 +303,14 @@ export const QuickInvoice = ({ onCreateInvoice, formatPrice, receipts, onPrintRe
 
           {/* Cart Items */}
           {items.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-xs sm:text-sm font-medium">Daftar Barang</Label>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="space-y-3 pt-3 border-t-2">
+              <Label className="text-sm font-semibold">Keranjang Belanja</Label>
+              <div className="space-y-2 max-h-64 overflow-y-auto p-2 bg-muted/30 rounded-md">
                 {items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                  <div key={item.id} className="flex items-center gap-2 p-3 bg-background border rounded-md shadow-sm">
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm truncate">{item.product.name}</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="font-semibold text-sm truncate">{item.product.name}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
                         {formatPrice(item.product.sellPrice)} × {item.quantity} = {formatPrice(item.product.sellPrice * item.quantity)}
                       </div>
                     </div>
@@ -297,13 +320,13 @@ export const QuickInvoice = ({ onCreateInvoice, formatPrice, receipts, onPrintRe
                         min="1"
                         value={item.quantity}
                         onChange={(e) => handleUpdateQuantity(item.id, Number(e.target.value) || 0)}
-                        className="h-8 w-16 text-xs text-center"
+                        className="h-9 w-16 text-sm text-center font-medium"
                       />
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveItem(item.id)}
-                        className="h-8 w-8 p-0 text-destructive"
+                        className="h-9 w-9 p-0 text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

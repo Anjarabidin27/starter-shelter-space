@@ -6,10 +6,8 @@ export const LazyShoppingCart = lazy(() => import('../POS/ShoppingCart').then(mo
 export const LazyReceipt = lazy(() => import('../POS/Receipt').then(module => ({ default: module.Receipt })));
 export const LazyAddProductForm = lazy(() => import('../POS/AddProductForm').then(module => ({ default: module.AddProductForm })));
 export const LazySalesReport = lazy(() => import('../POS/SalesReport').then(module => ({ default: module.SalesReport })));
-export const LazyManualReceiptReport = lazy(() => import('../Reports/ManualReceiptReport').then(module => ({ default: module.ManualReceiptReport })));
 export const LazyStockManagement = lazy(() => import('../POS/StockManagement').then(module => ({ default: module.StockManagement })));
 export const LazyReceiptHistory = lazy(() => import('../POS/ReceiptHistory').then(module => ({ default: module.ReceiptHistory })));
-export const LazyManualInvoice = lazy(() => import('../POS/ManualInvoice').then(module => ({ default: module.ManualInvoice })));
 export const LazyQuickInvoice = lazy(() => import('../POS/QuickInvoice').then(module => ({ default: module.QuickInvoice })));
 export const LazyShoppingList = lazy(() => import('../POS/ShoppingList').then(module => ({ default: module.ShoppingList })));
 export const LazyBluetoothManager = lazy(() => import('../POS/BluetoothManager').then(module => ({ default: module.BluetoothManager })));
