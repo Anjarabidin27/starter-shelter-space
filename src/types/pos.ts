@@ -4,7 +4,8 @@ export interface Product {
   costPrice: number; // Harga kulakan
   sellPrice: number; // Harga jual
   stock: number;
-  barcode?: string;
+  barcode?: string; // Barcode atau kode produk untuk scanner
+  code?: string; // Kode alternatif untuk input cepat
   category?: string;
   isPhotocopy?: boolean; // Special handling untuk fotocopy
 }

@@ -23,6 +23,8 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
     sellPrice: '',
     stock: '',
     category: '',
+    code: '',
+    barcode: '',
     isPhotocopy: false,
   });
   const [isService, setIsService] = useState(false);
@@ -65,6 +67,8 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
         sellPrice: parseFloat(formData.sellPrice),
         stock: (formData.isPhotocopy || isService) ? 0 : (stockQuantity || 0),
         category: formData.category || undefined,
+        code: formData.code || undefined,
+        barcode: formData.barcode || undefined,
         isPhotocopy: formData.isPhotocopy,
       });
     }
@@ -76,6 +80,8 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
       sellPrice: '',
       stock: '',
       category: '',
+      code: '',
+      barcode: '',
       isPhotocopy: false,
     });
     setStockQuantity(0);
@@ -133,6 +139,8 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
       sellPrice: product.sellPrice.toString(),
       stock: '',
       category: product.category || '',
+      code: product.code || '',
+      barcode: product.barcode || '',
       isPhotocopy: product.isPhotocopy || false,
     });
     setShowSuggestions(false);
@@ -241,6 +249,30 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
                   </Select>
                 </div>
 
+                <div>
+                  <Label htmlFor="code">Kode Produk (opsional)</Label>
+                  <Input
+                    id="code"
+                    type="text"
+                    value={formData.code}
+                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                    placeholder="Kode produk untuk input cepat"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="barcode">Barcode (opsional)</Label>
+                  <Input
+                    id="barcode"
+                    type="text"
+                    value={formData.barcode}
+                    onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                    placeholder="Barcode untuk scanner"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
                 <div className="md:col-span-2">
                   <Label>Jumlah Stok (opsional)</Label>
                   <QuantitySelector
@@ -264,7 +296,7 @@ export const AddProductForm = ({ onAddProduct, onUpdateProduct, products = [], o
                     className="rounded border border-input"
                   />
                   <Label htmlFor="isPhotocopy" className="text-sm">
-                    Layanan Fotocopy (Tiered Pricing)
+                    Layanan Fotocopy (Tiered Pricing) - Hanya untuk Toko ATK
                   </Label>
                 </div>
               </div>

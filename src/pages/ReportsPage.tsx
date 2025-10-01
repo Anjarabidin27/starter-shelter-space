@@ -57,7 +57,7 @@ export const ReportsPage = () => {
 
   return (
     <div className="min-h-screen w-full bg-background">
-      <div className="container mx-auto p-2 sm:p-4 max-w-7xl">
+      <div className="container mx-auto p-2 sm:p-4 md:p-6 max-w-7xl">
         <div className="space-y-4 sm:space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
@@ -74,12 +74,14 @@ export const ReportsPage = () => {
             </Link>
           </div>
 
-          <TransactionHistory
-            receipts={receipts.filter(receipt => !receipt.isManual && !receipt.id.startsWith('MNL-'))}
-            formatPrice={formatPrice}
-            onViewReceipt={handleViewReceipt}
-            onPrintReceipt={handlePrintReceipt}
-          />
+          <div className="overflow-x-auto">
+            <TransactionHistory
+              receipts={receipts.filter(receipt => !receipt.isManual && !receipt.id.startsWith('MNL-'))}
+              formatPrice={formatPrice}
+              onViewReceipt={handleViewReceipt}
+              onPrintReceipt={handlePrintReceipt}
+            />
+          </div>
         </div>
       </div>
     </div>

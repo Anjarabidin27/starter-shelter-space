@@ -13,6 +13,7 @@ import {
   LazyStockManagement,
   LazyReceiptHistory,
   LazyManualInvoice,
+  LazyQuickInvoice,
   LazyShoppingList,
   LazyBluetoothManager,
   ComponentLoader
@@ -368,24 +369,30 @@ Profit: ${formatPrice(receipt.profit)}
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex items-center gap-2">
                 <Store className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                <div className="hidden sm:block">
-                  <h1 className="text-lg sm:text-2xl font-bold">Kasir {currentStore?.name || 'Toko'}</h1>
-                  {currentStore?.address && (
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      {currentStore.address}
+                <Link to="/settings" className="hover:opacity-80 transition-opacity">
+                  <div className="hidden sm:block">
+                    <h1 className="text-lg sm:text-2xl font-bold cursor-pointer hover:text-primary">
+                      Kasir {currentStore?.name || 'Toko'}
+                    </h1>
+                    {currentStore?.address && (
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        {currentStore.address}
+                      </p>
+                    )}
+                    <p className="text-xs sm:text-sm text-primary font-medium">
+                      {getWelcomeMessage()}, {currentStore?.cashier_name || 'Admin Kasir'}
                     </p>
-                  )}
-                  <p className="text-xs sm:text-sm text-primary font-medium">
-                    {getWelcomeMessage()}, {currentStore?.cashier_name || 'Admin Kasir'}
-                  </p>
-                </div>
-                {/* Mobile compact header */}
-                <div className="sm:hidden">
-                  <h1 className="text-sm font-bold">{currentStore?.name || 'Toko'}</h1>
-                  <p className="text-xs text-primary">
-                    {getWelcomeMessage()}
-                  </p>
-                </div>
+                  </div>
+                  {/* Mobile compact header */}
+                  <div className="sm:hidden">
+                    <h1 className="text-sm font-bold cursor-pointer hover:text-primary">
+                      {currentStore?.name || 'Toko'}
+                    </h1>
+                    <p className="text-xs text-primary">
+                      {getWelcomeMessage()}
+                    </p>
+                  </div>
+                </Link>
               </div>
             </div>
             
@@ -521,8 +528,8 @@ Profit: ${formatPrice(receipt.profit)}
             <TabsTrigger value="pos" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
               Kasir
             </TabsTrigger>
-            <TabsTrigger value="manual-invoice" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
-              Nota Manual
+            <TabsTrigger value="quick-invoice" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
+              Nota Cepat
             </TabsTrigger>
             <TabsTrigger value="shopping-list" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
               Daftar Belanja
@@ -575,14 +582,14 @@ Profit: ${formatPrice(receipt.profit)}
                               <div
                                 key={product.id}
                                 className="p-2 hover:bg-muted cursor-pointer border-b last:border-b-0"
-                                onClick={() => {
-                                  if (product.isPhotocopy) {
-                                    handlePhotocopyClick(product);
-                                  } else {
-                                    addToCart(product, 1);
-                                  }
-                                  setSearchTerm('');
-                                }}
+                                 onClick={() => {
+                                   if (product.isPhotocopy && currentStore?.category === 'atk') {
+                                     handlePhotocopyClick(product);
+                                   } else {
+                                     addToCart(product, 1);
+                                   }
+                                   setSearchTerm('');
+                                 }}
                               >
                                 <div className="flex items-center justify-between">
                                   <div className="flex-1">
@@ -627,17 +634,19 @@ Profit: ${formatPrice(receipt.profit)}
                       </div>
                     </div>
                     <div className="space-y-4">
-                      {/* Layanan Fotocopy */}
-                      <PhotocopyService 
-                        onAddToCart={addToCart}
-                        formatPrice={formatPrice}
-                      />
+                      {/* Layanan Fotocopy - only for ATK stores */}
+                      {currentStore?.category === 'atk' && (
+                        <PhotocopyService 
+                          onAddToCart={addToCart}
+                          formatPrice={formatPrice}
+                        />
+                      )}
                       
                       <Suspense fallback={<ComponentLoader />}>
                         <LazyProductGrid 
                           products={filteredProducts}
                           onAddToCart={addToCart}
-                          onPhotocopyClick={handlePhotocopyClick}
+                          onPhotocopyClick={currentStore?.category === 'atk' ? handlePhotocopyClick : undefined}
                         />
                       </Suspense>
                     </div>
@@ -700,9 +709,9 @@ Profit: ${formatPrice(receipt.profit)}
             </Tabs>
           </TabsContent>
 
-          <TabsContent value="manual-invoice" className="space-y-4">
+          <TabsContent value="quick-invoice" className="space-y-4">
             <Suspense fallback={<ComponentLoader />}>
-              <LazyManualInvoice 
+              <LazyQuickInvoice 
                 onCreateInvoice={handleManualInvoice}
                 formatPrice={formatPrice}
                 receipts={receipts}
@@ -814,8 +823,8 @@ Profit: ${formatPrice(receipt.profit)}
           description="Masukkan kata sandi admin untuk mengakses menu admin"
         />
 
-        {/* Photocopy Dialog */}
-        {photocopyProduct && (
+        {/* Photocopy Dialog - only for ATK stores */}
+        {currentStore?.category === 'atk' && photocopyProduct && (
           <PhotocopyDialog
             isOpen={showPhotocopyDialog}
             onClose={() => {
