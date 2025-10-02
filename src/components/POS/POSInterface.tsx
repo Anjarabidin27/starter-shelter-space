@@ -467,8 +467,8 @@ Profit: ${formatPrice(receipt.profit)}
 
         {/* Dashboard Stats */}
       <div className="w-full px-2 sm:px-4 py-2 sm:py-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
-          <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleDashboardClick('revenue')}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
+          <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1" onClick={() => handleDashboardClick('revenue')}>
             <CardContent className="flex items-center p-4">
               <DollarSign className="h-8 w-8 text-success mr-3" />
               <div>
@@ -510,7 +510,7 @@ Profit: ${formatPrice(receipt.profit)}
             setCurrentTab(value);
           }
         }} className="w-full">
-          <TabsList className="flex flex-wrap w-full h-auto p-1 gap-1 justify-start">
+          <TabsList className="grid grid-cols-4 sm:flex sm:flex-wrap w-full h-auto p-1 gap-1 sm:justify-start">
             <TabsTrigger value="pos" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
               Kasir
             </TabsTrigger>

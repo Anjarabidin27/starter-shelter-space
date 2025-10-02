@@ -152,11 +152,15 @@ export const SalesReport = ({ receipts, formatPrice }: SalesReportProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Laporan Penjualan</h2>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold">Laporan Penjualan</h2>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={handlePrint} variant="outline" className="w-full sm:w-auto">
+            <FileText className="w-4 h-4 mr-2" />
+            Cetak Laporan
+          </Button>
           <Select value={selectedPeriod} onValueChange={(value: ReportPeriod) => setSelectedPeriod(value)}>
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="w-full sm:w-48">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -167,10 +171,6 @@ export const SalesReport = ({ receipts, formatPrice }: SalesReportProps) => {
               <SelectItem value="365d">1 Tahun Terakhir</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handlePrint} variant="outline">
-            <FileText className="w-4 h-4 mr-2" />
-            Cetak Laporan
-          </Button>
         </div>
       </div>
 
