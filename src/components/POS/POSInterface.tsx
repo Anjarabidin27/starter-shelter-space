@@ -658,38 +658,16 @@ Profit: ${formatPrice(receipt.profit)}
           </TabsContent>
 
           <TabsContent value="stock" className="space-y-4">
-            <Tabs defaultValue="products" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="products">Stok Produk</TabsTrigger>
-                <TabsTrigger value="low-stock">Stok Menipis</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="products" className="space-y-4">
-                <Suspense fallback={<ComponentLoader />}>
-                  <LazyStockManagement 
-                    products={products}
-                    onUpdateProduct={updateProduct}
-                    onDeleteProduct={deleteProduct}
-                    formatPrice={formatPrice}
-                    showLowStockOnly={false}
-                    readOnly={true}
-                  />
-                </Suspense>
-              </TabsContent>
-              
-              <TabsContent value="low-stock" className="space-y-4">
-                <Suspense fallback={<ComponentLoader />}>
-                  <LazyStockManagement 
-                    products={products}
-                    onUpdateProduct={updateProduct}
-                    onDeleteProduct={deleteProduct}
-                    formatPrice={formatPrice}
-                    showLowStockOnly={true}
-                    readOnly={true}
-                  />
-                </Suspense>
-              </TabsContent>
-            </Tabs>
+            <Suspense fallback={<ComponentLoader />}>
+              <LazyStockManagement 
+                products={products}
+                onUpdateProduct={updateProduct}
+                onDeleteProduct={deleteProduct}
+                formatPrice={formatPrice}
+                showLowStockOnly={false}
+                readOnly={true}
+              />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="quick-invoice" className="space-y-4">

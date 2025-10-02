@@ -115,7 +115,11 @@ export const QuantitySelector = ({
           size="sm"
           variant="outline"
           className="h-8 w-8 p-0"
-          onClick={() => handleQuantityChange(quantity - 1)}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleQuantityChange(quantity - 1);
+          }}
         >
           <Minus className="h-3 w-3" />
         </Button>
@@ -136,7 +140,11 @@ export const QuantitySelector = ({
           size="sm"
           variant="outline"
           className="h-8 w-8 p-0"
-          onClick={() => handleQuantityChange(quantity + 1)}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleQuantityChange(quantity + 1);
+          }}
           disabled={maxStock !== undefined && quantity >= maxStock}
         >
           <Plus className="h-3 w-3" />
