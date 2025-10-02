@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { QuantitySelector } from './QuantitySelector';
 import { toast } from 'sonner';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
+import { useStore } from '@/contexts/StoreContext';
 
 interface AddProductFormProps {
   onAddProduct: (product: Omit<Product, 'id'>) => void;
@@ -36,6 +37,14 @@ export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], o
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
   const [isScanning, setIsScanning] = useState(false);
+  const { currentStore } = useStore();
+  const isAtkStore = currentStore?.category === 'atk';
+
+  useEffect(() => {
+    if (currentStore?.category !== 'atk' && formData.isPhotocopy) {
+      setFormData(prev => ({ ...prev, isPhotocopy: false }));
+    }
+  }, [currentStore?.category, formData.isPhotocopy]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,7 +324,9 @@ export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], o
                       <SelectValue placeholder="Pilih kategori" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Fotocopy">Fotocopy</SelectItem>
+                      {isAtkStore && (
+                        <SelectItem value="Fotocopy">Fotocopy</SelectItem>
+                      )}
                       <SelectItem value="Alat Tulis">Alat Tulis</SelectItem>
                       <SelectItem value="ATK">ATK</SelectItem>
                       <SelectItem value="Kertas">Kertas</SelectItem>
@@ -363,18 +374,20 @@ export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], o
                   />
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="isPhotocopy"
-                    checked={formData.isPhotocopy}
-                    onChange={(e) => setFormData({ ...formData, isPhotocopy: e.target.checked })}
-                    className="rounded border border-input"
-                  />
-                  <Label htmlFor="isPhotocopy" className="text-sm">
-                    Layanan Fotocopy (Tiered Pricing) - Hanya untuk Toko ATK
-                  </Label>
-                </div>
+                {isAtkStore && (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="isPhotocopy"
+                      checked={formData.isPhotocopy}
+                      onChange={(e) => setFormData({ ...formData, isPhotocopy: e.target.checked })}
+                      className="rounded border border-input"
+                    />
+                    <Label htmlFor="isPhotocopy" className="text-sm">
+                      Layanan Fotocopy (Tiered Pricing) - Hanya untuk Toko ATK
+                    </Label>
+                  </div>
+                )}
               </div>
               
               <div className="flex gap-2 pt-4">
@@ -440,13 +453,15 @@ export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], o
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih kategori" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Fotocopy">Fotocopy</SelectItem>
-                      <SelectItem value="Laminasi">Laminasi</SelectItem>
-                      <SelectItem value="Jilid">Jilid</SelectItem>
-                      <SelectItem value="Scan">Scan</SelectItem>
-                      <SelectItem value="Lainnya">Lainnya</SelectItem>
-                    </SelectContent>
+                      <SelectContent>
+                        {isAtkStore && (
+                          <SelectItem value="Fotocopy">Fotocopy</SelectItem>
+                        )}
+                        <SelectItem value="Laminasi">Laminasi</SelectItem>
+                        <SelectItem value="Jilid">Jilid</SelectItem>
+                        <SelectItem value="Scan">Scan</SelectItem>
+                        <SelectItem value="Lainnya">Lainnya</SelectItem>
+                      </SelectContent>
                   </Select>
                 </div>
               </div>

@@ -118,7 +118,7 @@ export const POSInterface = () => {
         setCurrentTab('stock-management');
         break;
       case 'stock':
-        setCurrentTab('low-stock');
+        setCurrentTab('stock');
         break;
     }
   };
