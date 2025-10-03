@@ -16,6 +16,7 @@ import { QuantitySelector } from './QuantitySelector';
 import { QuickProductSearch } from './QuickProductSearch';
 import { Product } from '@/types/pos';
 import { useBluetoothContext } from '@/contexts/BluetoothContext';
+import { PaymentMethodSelector } from './PaymentMethodSelector';
 
 interface ShoppingCartProps {
   cart: CartItem[];
@@ -334,20 +335,7 @@ export const ShoppingCart = ({
         <Separator />
         
         <div className="space-y-3 sm:space-y-4">
-          <div className="space-y-1 sm:space-y-2">
-            <Label className="text-xs sm:text-sm font-medium">Metode Pembayaran</Label>
-            <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-              <SelectTrigger className="h-8 sm:h-10 text-xs sm:text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="cash">Tunai</SelectItem>
-                <SelectItem value="debit">Kartu Debit</SelectItem>
-                <SelectItem value="credit">Kartu Kredit</SelectItem>
-                <SelectItem value="qris">QRIS</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
 
           <div className="space-y-1 sm:space-y-2">
             <Label className="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2">

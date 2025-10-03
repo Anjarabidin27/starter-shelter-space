@@ -33,6 +33,10 @@ export const StoreSettings = () => {
     cashier_name: '',
     opening_hours: '',
     closing_hours: '',
+    bank_name: '',
+    bank_account_number: '',
+    bank_account_holder: '',
+    ewallet_number: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
@@ -47,6 +51,10 @@ export const StoreSettings = () => {
         cashier_name: currentStore.cashier_name || '',
         opening_hours: currentStore.opening_hours || '',
         closing_hours: currentStore.closing_hours || '',
+        bank_name: currentStore.bank_name || '',
+        bank_account_number: currentStore.bank_account_number || '',
+        bank_account_holder: currentStore.bank_account_holder || '',
+        ewallet_number: currentStore.ewallet_number || '',
       });
     }
   }, [currentStore]);
@@ -84,13 +92,15 @@ export const StoreSettings = () => {
 
   if (showAdminProtection) {
     return (
-      <AdminProtection
-        isOpen={showAdminProtection}
-        onClose={() => navigate('/')}
-        onSuccess={() => setShowAdminProtection(false)}
-        title="Masuk ke Pengaturan Toko"
-        description="Masukkan kode admin untuk mengakses pengaturan toko"
-      />
+      <div className="min-h-screen w-full bg-background flex items-center justify-center p-4">
+        <AdminProtection
+          isOpen={showAdminProtection}
+          onClose={() => navigate('/')}
+          onSuccess={() => setShowAdminProtection(false)}
+          title="Masuk ke Pengaturan Toko"
+          description="Masukkan kode admin untuk mengakses pengaturan toko"
+        />
+      </div>
     );
   }
 
@@ -185,7 +195,7 @@ export const StoreSettings = () => {
                   Pengaturan informasi kasir untuk nota
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3 sm:space-y-4">
                 <div>
                   <Label htmlFor="cashier_name" className="text-xs sm:text-sm">Nama Kasir</Label>
                   <Input
@@ -220,6 +230,63 @@ export const StoreSettings = () => {
                       className="h-9 sm:h-10 text-sm"
                     />
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-base sm:text-lg">Informasi Pembayaran</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Pengaturan metode pembayaran untuk transaksi
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div>
+                  <Label htmlFor="bank_name" className="text-xs sm:text-sm">Nama Bank</Label>
+                  <Input
+                    id="bank_name"
+                    value={formData.bank_name}
+                    onChange={(e) => handleInputChange('bank_name', e.target.value)}
+                    placeholder="Contoh: BRI, BCA, Mandiri"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="bank_account_number" className="text-xs sm:text-sm">Nomor Rekening</Label>
+                  <Input
+                    id="bank_account_number"
+                    value={formData.bank_account_number}
+                    onChange={(e) => handleInputChange('bank_account_number', e.target.value)}
+                    placeholder="Nomor rekening bank"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="bank_account_holder" className="text-xs sm:text-sm">Nama Pemilik Rekening</Label>
+                  <Input
+                    id="bank_account_holder"
+                    value={formData.bank_account_holder}
+                    onChange={(e) => handleInputChange('bank_account_holder', e.target.value)}
+                    placeholder="Nama pemilik rekening"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="ewallet_number" className="text-xs sm:text-sm">Nomor E-Wallet untuk QRIS</Label>
+                  <Input
+                    id="ewallet_number"
+                    value={formData.ewallet_number}
+                    onChange={(e) => handleInputChange('ewallet_number', e.target.value)}
+                    placeholder="Nomor telepon e-wallet (OVO, GoPay, Dana, dll)"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Nomor ini akan digunakan untuk generate kode QRIS
+                  </p>
                 </div>
               </CardContent>
             </Card>

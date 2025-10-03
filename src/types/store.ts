@@ -17,6 +17,10 @@ export interface Store {
   cashier_name?: string;
   opening_hours?: string;
   closing_hours?: string;
+  bank_name?: string;
+  bank_account_number?: string;
+  bank_account_holder?: string;
+  ewallet_number?: string;
   owner_id: string;
   created_at: string;
   updated_at: string;

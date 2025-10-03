@@ -36,6 +36,15 @@ export const formatThermalReceipt = (
     ? `Buka: ${store.opening_hours} - ${store.closing_hours}` 
     : '';
 
+  const paymentInfo = receipt.paymentMethod?.toLowerCase() === 'transfer' && store?.bank_name
+    ? `\nTransfer ke:
+${store.bank_name}
+No. Rek: ${store.bank_account_number || ''}
+a.n. ${store.bank_account_holder || ''}`
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
+    ? `\nQRIS: ${store.ewallet_number}`
+    : '';
+
   return `${ESC}@${CENTER}${BOLD_ON}================================${BOLD_OFF}
 ${BOLD_ON}${storeName}${BOLD_OFF}
 ${BOLD_ON}================================${BOLD_OFF}
@@ -67,7 +76,7 @@ Diskon: ${' '.repeat(Math.max(0, 17 - `Rp ${formatAmount(receipt.discount)}`.len
 ${BOLD_ON}--------------------------------${BOLD_OFF}
 ${BOLD_ON}TOTAL: ${' '.repeat(Math.max(0, 18 - `Rp ${formatAmount(receipt.total)}`.length))}Rp ${formatAmount(receipt.total)}${BOLD_OFF}
 
-Metode: ${BOLD_ON}${receipt.paymentMethod?.toUpperCase() || 'CASH'}${BOLD_OFF}
+Metode: ${BOLD_ON}${receipt.paymentMethod?.toUpperCase() || 'CASH'}${BOLD_OFF}${paymentInfo}
 
 ${CENTER}${BOLD_ON}================================${BOLD_OFF}
 ${BOLD_ON}TERIMA KASIH ATAS${BOLD_OFF}
@@ -117,6 +126,14 @@ export const formatMobileA4ThermalReceipt = (
     ? `Buka: ${store.opening_hours} - ${store.closing_hours}` 
     : '';
 
+  const paymentInfoA4 = receipt.paymentMethod?.toLowerCase() === 'transfer' && store?.bank_name
+    ? `\n\nTransfer ke: ${store.bank_name}
+No. Rekening: ${store.bank_account_number || ''}
+Atas Nama: ${store.bank_account_holder || ''}`
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
+    ? `\nQRIS E-Wallet: ${store.ewallet_number}`
+    : '';
+
   return `${ESC}@${CENTER}${BOLD_ON}${DOUBLE_HEIGHT}================================================${BOLD_OFF}${NORMAL_SIZE}
 ${BOLD_ON}${DOUBLE_HEIGHT}      ${storeName}      ${BOLD_OFF}${NORMAL_SIZE}
 ${BOLD_ON}${DOUBLE_HEIGHT}================================================${BOLD_OFF}${NORMAL_SIZE}
@@ -150,7 +167,7 @@ Diskon:${' '.repeat(Math.max(0, lineWidth - 7 - `Rp ${formatAmount(receipt.disco
 ${BOLD_ON}------------------------------------------------${BOLD_OFF}
 ${BOLD_ON}${DOUBLE_HEIGHT}TOTAL:${' '.repeat(Math.max(0, (lineWidth/2) - 6 - `Rp ${formatAmount(receipt.total)}`.length))}Rp ${formatAmount(receipt.total)}${BOLD_OFF}${NORMAL_SIZE}
 
-Metode Pembayaran: ${BOLD_ON}${receipt.paymentMethod?.toUpperCase() || 'CASH'}${BOLD_OFF}
+Metode Pembayaran: ${BOLD_ON}${receipt.paymentMethod?.toUpperCase() || 'CASH'}${BOLD_OFF}${paymentInfoA4}
 
 ${CENTER}${BOLD_ON}================================================${BOLD_OFF}
 ${BOLD_ON}${DOUBLE_HEIGHT}        TERIMA KASIH ATAS        ${BOLD_OFF}${NORMAL_SIZE}
@@ -183,6 +200,27 @@ export const formatPrintReceipt = (
   const storePhone = store?.phone || '';
   const storeHours = (store?.opening_hours && store?.closing_hours) 
     ? `Buka: ${store.opening_hours} - ${store.closing_hours}` 
+    : '';
+
+  const paymentDetails = receipt.paymentMethod?.toLowerCase() === 'transfer' && store?.bank_name
+    ? `
+        <div style="border-top: 1px solid #e5e7eb; margin: 16px 0; padding-top: 16px;">
+          <div style="font-size: 14px; color: #666; margin-bottom: 8px; font-weight: 500;">Informasi Transfer:</div>
+          <div style="font-size: 14px;">
+            <div style="margin-bottom: 4px;">Bank: <strong>${store.bank_name}</strong></div>
+            <div style="margin-bottom: 4px;">No. Rekening: <strong>${store.bank_account_number || ''}</strong></div>
+            <div>Atas Nama: <strong>${store.bank_account_holder || ''}</strong></div>
+          </div>
+        </div>
+      `
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
+    ? `
+        <div style="border-top: 1px solid #e5e7eb; margin: 16px 0; padding-top: 16px;">
+          <div style="font-size: 14px; color: #666; text-align: center;">
+            QRIS E-Wallet: <strong>${store.ewallet_number}</strong>
+          </div>
+        </div>
+      `
     : '';
 
   return `
@@ -246,12 +284,17 @@ export const formatPrintReceipt = (
 
         <div style="border-top: 1px solid #e5e7eb; margin: 16px 0;"></div>
 
+        <div style="font-size: 14px; margin: 8px 0;">
+          <p style="margin-bottom: 4px;">Metode Pembayaran: <strong>${receipt.paymentMethod?.toUpperCase() || 'CASH'}</strong></p>
+        </div>
+
+        ${paymentDetails}
+
+        <div style="border-top: 1px solid #e5e7eb; margin: 16px 0;"></div>
+
         <div style="text-align: center; font-size: 14px; color: #666;">
           <p style="margin-bottom: 8px;">Terima kasih atas kunjungan Anda!</p>
           <p style="margin-bottom: 8px;">Semoga Hari Anda Menyenangkan</p>
-          <p style="margin-top: 16px; font-family: monospace;">
-            Kasir: Admin | ${receipt.paymentMethod?.toUpperCase() || 'CASH'}
-          </p>
         </div>
       </div>
     `;
@@ -280,6 +323,27 @@ export const formatMobileA4PrintReceipt = (
   const storeName = store?.name?.toUpperCase() || 'TOKO';
   const storeAddress = store?.address || '';
   const storePhone = store?.phone || '';
+
+  const paymentDetailsA4Mobile = receipt.paymentMethod?.toLowerCase() === 'transfer' && store?.bank_name
+    ? `
+        <div style="border-top: 2px solid #000; margin: 30px 0; padding-top: 20px;">
+          <div style="font-size: 18px; margin-bottom: 15px; font-weight: bold;">Informasi Transfer:</div>
+          <div style="font-size: 16px;">
+            <div style="margin-bottom: 8px;">Bank: <strong>${store.bank_name}</strong></div>
+            <div style="margin-bottom: 8px;">No. Rekening: <strong>${store.bank_account_number || ''}</strong></div>
+            <div>Atas Nama: <strong>${store.bank_account_holder || ''}</strong></div>
+          </div>
+        </div>
+      `
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
+    ? `
+        <div style="border-top: 2px solid #000; margin: 30px 0; padding-top: 20px; text-align: center;">
+          <div style="font-size: 16px;">
+            QRIS E-Wallet: <strong>${store.ewallet_number}</strong>
+          </div>
+        </div>
+      `
+    : '';
 
   return `
       <div style="font-family: monospace; width: 100%; max-width: 100%; margin: 0; padding: 20px; box-sizing: border-box;">
@@ -326,10 +390,17 @@ export const formatMobileA4PrintReceipt = (
           </div>
         </div>
         
+        <div style="border-top: 2px solid #000; margin: 30px 0; padding-top: 20px;">
+          <div style="font-size: 16px; margin-bottom: 10px;">
+            Metode Pembayaran: <strong>${receipt.paymentMethod?.toUpperCase() || 'CASH'}</strong>
+          </div>
+        </div>
+
+        ${paymentDetailsA4Mobile}
+        
         <div style="text-align: center; margin-top: 40px; font-size: 16px;">
           <p style="margin-bottom: 10px; font-weight: bold;">Terima kasih atas kunjungan Anda!</p>
           <p style="margin-bottom: 10px; font-weight: bold;">Semoga Hari Anda Menyenangkan</p>
-          <p style="margin-top: 20px; font-size: 14px;">Kasir: Admin | ${receipt.paymentMethod?.toUpperCase() || 'CASH'}</p>
         </div>
       </div>
     `;
