@@ -15,6 +15,8 @@ export interface Store {
   phone?: string;
   address?: string;
   cashier_name?: string;
+  opening_hours?: string;
+  closing_hours?: string;
   owner_id: string;
   created_at: string;
   updated_at: string;

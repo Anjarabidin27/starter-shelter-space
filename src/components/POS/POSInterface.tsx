@@ -35,7 +35,8 @@ import {
   BarChart3,
   LogOut,
   Settings,
-  RefreshCw
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 import { useStore } from '@/contexts/StoreContext';
@@ -300,7 +301,7 @@ Profit: ${formatPrice(receipt.profit)}
   // Memoized calculations for dashboard statistics to improve performance and ensure reactivity
   const dashboardStats = useMemo(() => {
     const totalProducts = products.length;
-    const lowStockProducts = products.filter(product => product.stock <= 24 && !product.isPhotocopy).length;
+    const lowStockProductsArray = products.filter(product => product.stock <= 24 && !product.isPhotocopy);
     
     const today = new Date();
     const todayString = today.toDateString();
@@ -333,7 +334,7 @@ Profit: ${formatPrice(receipt.profit)}
     
     return {
       totalProducts,
-      lowStockProducts,
+      lowStockProductsArray,
       todayRevenue,
       todayProfit,
       todayManualRevenue,
@@ -341,7 +342,8 @@ Profit: ${formatPrice(receipt.profit)}
     };
   }, [products, receipts]);
 
-  const { totalProducts, lowStockProducts, todayRevenue, todayProfit, todayManualRevenue, todayPhotocopyEarnings } = dashboardStats;
+  const { totalProducts, lowStockProductsArray, todayRevenue, todayProfit, todayManualRevenue, todayPhotocopyEarnings } = dashboardStats;
+  const lowStockCount = lowStockProductsArray.length;
 
   // Welcome message based on time
   const getWelcomeMessage = () => {
@@ -467,40 +469,40 @@ Profit: ${formatPrice(receipt.profit)}
 
         {/* Dashboard Stats */}
       <div className="w-full px-2 sm:px-4 py-2 sm:py-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
-          <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow sm:col-span-2 lg:col-span-1" onClick={() => handleDashboardClick('revenue')}>
+        <div className="grid grid-cols-1 gap-2 sm:gap-4 mb-4 sm:mb-6">
+          {/* Full width card on top */}
+          <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleDashboardClick('revenue')}>
             <CardContent className="flex items-center p-4">
               <DollarSign className="h-8 w-8 text-success mr-3" />
               <div>
-                <div className="text-2xl font-bold text-success">
-                  {formatPrice(todayRevenue)}
-                </div>
-                <div className="text-sm text-muted-foreground">Penjualan Hari Ini</div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleDashboardClick('profit')}>
-            <CardContent className="flex items-center p-4">
-              <TrendingUp className="h-8 w-8 text-primary mr-3" />
-              <div>
-                <div className="text-2xl font-bold text-primary">
-                  {formatPrice(todayProfit)}
-                </div>
-                <div className="text-sm text-muted-foreground">Keuntungan Hari Ini</div>
+                <p className="text-xs sm:text-sm text-muted-foreground">Penjualan Hari Ini</p>
+                <p className="text-lg sm:text-2xl font-bold">{formatPrice(todayRevenue)}</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleDashboardClick('stock')}>
-            <CardContent className="flex items-center p-4">
-              <Users className="h-8 w-8 text-error mr-3" />
+          {/* Two cards side by side */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleDashboardClick('profit')}>
+              <CardContent className="flex items-center p-4">
+                <TrendingUp className="h-8 w-8 text-primary mr-3" />
+                <div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Keuntungan Hari Ini</p>
+                  <p className="text-lg sm:text-2xl font-bold">{formatPrice(todayProfit)}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="pos-card cursor-pointer hover:shadow-lg transition-shadow" onClick={() => handleDashboardClick('low-stock')}>
+              <CardContent className="flex items-center p-4">
+                <AlertTriangle className="h-8 w-8 text-warning mr-3" />
               <div>
-                <div className="text-2xl font-bold">{lowStockProducts}</div>
-                <div className="text-sm text-muted-foreground">Stok Menipis</div>
-              </div>
-            </CardContent>
-          </Card>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Stok Menipis</p>
+                  <p className="text-lg sm:text-2xl font-bold">{lowStockCount}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         <Tabs value={currentTab} onValueChange={(value) => {
@@ -686,6 +688,43 @@ Profit: ${formatPrice(receipt.profit)}
             <Suspense fallback={<ComponentLoader />}>
               <LazyShoppingList />
             </Suspense>
+          </TabsContent>
+
+          {/* Low Stock Tab */}
+          <TabsContent value="low-stock" className="mt-0 space-y-4">
+            <Card className="pos-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-warning" />
+                  Stok Menipis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {lowStockProductsArray.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <AlertTriangle className="h-12 w-12 mx-auto mb-2 text-success" />
+                    <p>Tidak ada stok yang menipis</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {lowStockProductsArray.map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center justify-between p-3 border rounded-md bg-card hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium">{product.name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Stok: {product.stock} {product.category ? `• ${product.category}` : ''}
+                          </p>
+                        </div>
+                        <Badge variant="destructive">{product.stock} tersisa</Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="admin" className="space-y-2 sm:space-y-4">

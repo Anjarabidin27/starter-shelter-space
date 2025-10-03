@@ -17,6 +17,7 @@ import { StoreCategory, STORE_CATEGORIES } from '@/types/store';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, Save, Store as StoreIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AdminProtection } from '@/components/Auth/AdminProtection';
 
 export const StoreSettings = () => {
   const { currentStore, updateStore } = useStore();
@@ -30,8 +31,11 @@ export const StoreSettings = () => {
     phone: '',
     address: '',
     cashier_name: '',
+    opening_hours: '',
+    closing_hours: '',
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [showAdminProtection, setShowAdminProtection] = useState(true);
 
   useEffect(() => {
     if (currentStore) {
@@ -41,6 +45,8 @@ export const StoreSettings = () => {
         phone: currentStore.phone || '',
         address: currentStore.address || '',
         cashier_name: currentStore.cashier_name || '',
+        opening_hours: currentStore.opening_hours || '',
+        closing_hours: currentStore.closing_hours || '',
       });
     }
   }, [currentStore]);
@@ -73,6 +79,18 @@ export const StoreSettings = () => {
           </Button>
         </div>
       </div>
+    );
+  }
+
+  if (showAdminProtection) {
+    return (
+      <AdminProtection
+        isOpen={showAdminProtection}
+        onClose={() => navigate('/')}
+        onSuccess={() => setShowAdminProtection(false)}
+        title="Masuk ke Pengaturan Toko"
+        description="Masukkan kode admin untuk mengakses pengaturan toko"
+      />
     );
   }
 
@@ -177,6 +195,31 @@ export const StoreSettings = () => {
                     placeholder="Nama kasir"
                     className="h-9 sm:h-10 text-sm"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div>
+                    <Label htmlFor="opening_hours" className="text-xs sm:text-sm">Jam Buka</Label>
+                    <Input
+                      id="opening_hours"
+                      type="time"
+                      value={formData.opening_hours}
+                      onChange={(e) => handleInputChange('opening_hours', e.target.value)}
+                      placeholder="08:00"
+                      className="h-9 sm:h-10 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="closing_hours" className="text-xs sm:text-sm">Jam Tutup</Label>
+                    <Input
+                      id="closing_hours"
+                      type="time"
+                      value={formData.closing_hours}
+                      onChange={(e) => handleInputChange('closing_hours', e.target.value)}
+                      placeholder="21:00"
+                      className="h-9 sm:h-10 text-sm"
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>

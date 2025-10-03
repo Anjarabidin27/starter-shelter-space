@@ -32,11 +32,14 @@ export const formatThermalReceipt = (
   const storeName = store?.name?.toUpperCase() || 'TOKO';
   const storeAddress = store?.address || '';
   const storePhone = store?.phone || '';
+  const storeHours = (store?.opening_hours && store?.closing_hours) 
+    ? `Buka: ${store.opening_hours} - ${store.closing_hours}` 
+    : '';
 
   return `${ESC}@${CENTER}${BOLD_ON}================================${BOLD_OFF}
 ${BOLD_ON}${storeName}${BOLD_OFF}
 ${BOLD_ON}================================${BOLD_OFF}
-${storeAddress ? storeAddress + '\n' : ''}${storePhone ? 'Telp/WA: ' + storePhone + '\n' : ''}
+${storeAddress ? storeAddress + '\n' : ''}${storePhone ? 'Telp/WA: ' + storePhone + '\n' : ''}${storeHours ? storeHours + '\n' : ''}
 
 ${BOLD_ON}================================${BOLD_OFF}
 ${BOLD_ON}STRUK PENJUALAN${BOLD_OFF}
@@ -110,11 +113,14 @@ export const formatMobileA4ThermalReceipt = (
   const storeName = store?.name?.toUpperCase() || 'TOKO';
   const storeAddress = store?.address || '';
   const storePhone = store?.phone || '';
+  const storeHours = (store?.opening_hours && store?.closing_hours) 
+    ? `Buka: ${store.opening_hours} - ${store.closing_hours}` 
+    : '';
 
   return `${ESC}@${CENTER}${BOLD_ON}${DOUBLE_HEIGHT}================================================${BOLD_OFF}${NORMAL_SIZE}
 ${BOLD_ON}${DOUBLE_HEIGHT}      ${storeName}      ${BOLD_OFF}${NORMAL_SIZE}
 ${BOLD_ON}${DOUBLE_HEIGHT}================================================${BOLD_OFF}${NORMAL_SIZE}
-${CENTER}${storeAddress ? storeAddress + '\n' : ''}${storePhone ? 'Telp/WA: ' + storePhone + '\n' : ''}
+${CENTER}${storeAddress ? storeAddress + '\n' : ''}${storePhone ? 'Telp/WA: ' + storePhone + '\n' : ''}${storeHours ? storeHours + '\n' : ''}
 
 ${BOLD_ON}================================================${BOLD_OFF}
 ${BOLD_ON}${CENTER}           STRUK PENJUALAN           ${BOLD_OFF}
@@ -175,13 +181,17 @@ export const formatPrintReceipt = (
   const storeName = store?.name || 'Toko';
   const storeAddress = store?.address || '';
   const storePhone = store?.phone || '';
+  const storeHours = (store?.opening_hours && store?.closing_hours) 
+    ? `Buka: ${store.opening_hours} - ${store.closing_hours}` 
+    : '';
 
   return `
       <div style="font-family: -ui-monospace, SFMono-Regular, 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace; max-width: 380px; margin: 0 auto; padding: 20px; background: white;">
         <div style="text-align: center; padding-bottom: 16px;">
           <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">${storeName}</h2>
           ${storeAddress ? `<p style="font-size: 14px; color: #666; margin-bottom: 4px;">${storeAddress}</p>` : ''}
-          ${storePhone ? `<p style="font-size: 14px; color: #666; margin-bottom: 0;">Telp/WA: ${storePhone}</p>` : ''}
+          ${storePhone ? `<p style="font-size: 14px; color: #666; margin-bottom: 4px;">Telp/WA: ${storePhone}</p>` : ''}
+          ${storeHours ? `<p style="font-size: 14px; color: #666; margin-bottom: 0;">${storeHours}</p>` : ''}
         </div>
 
         <div style="border-top: 1px solid #e5e7eb; margin: 16px 0;"></div>

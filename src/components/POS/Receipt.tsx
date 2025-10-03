@@ -137,6 +137,11 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
                 HP: {currentStore.phone}
               </p>
             )}
+            {(currentStore?.opening_hours || currentStore?.closing_hours) && (
+              <p className="text-sm text-muted-foreground">
+                Buka: {currentStore?.opening_hours || '-'} - {currentStore?.closing_hours || '-'}
+              </p>
+            )}
           </div>
 
           {/* Items */}
