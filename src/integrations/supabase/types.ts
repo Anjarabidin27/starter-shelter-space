@@ -96,30 +96,42 @@ export type Database = {
       }
       receipt_items: {
         Row: {
+          cost_price: number | null
           created_at: string
           final_price: number | null
           id: string
-          product_id: string
+          product_id: string | null
+          product_name: string | null
+          profit: number | null
           quantity: number
           receipt_id: string
+          total_price: number | null
           unit_price: number
         }
         Insert: {
+          cost_price?: number | null
           created_at?: string
           final_price?: number | null
           id?: string
-          product_id: string
+          product_id?: string | null
+          product_name?: string | null
+          profit?: number | null
           quantity: number
           receipt_id: string
+          total_price?: number | null
           unit_price: number
         }
         Update: {
+          cost_price?: number | null
           created_at?: string
           final_price?: number | null
           id?: string
-          product_id?: string
+          product_id?: string | null
+          product_name?: string | null
+          profit?: number | null
           quantity?: number
           receipt_id?: string
+          total_price?: number | null
           unit_price?: number
         }
         Relationships: [
@@ -144,6 +156,7 @@ export type Database = {
           created_at: string
           discount: number | null
           id: string
+          invoice_number: string | null
           payment_method: string | null
           profit: number
           store_id: string | null
@@ -155,6 +168,7 @@ export type Database = {
           created_at?: string
           discount?: number | null
           id?: string
+          invoice_number?: string | null
           payment_method?: string | null
           profit: number
           store_id?: string | null
@@ -166,6 +180,7 @@ export type Database = {
           created_at?: string
           discount?: number | null
           id?: string
+          invoice_number?: string | null
           payment_method?: string | null
           profit?: number
           store_id?: string | null
@@ -236,35 +251,65 @@ export type Database = {
       stores: {
         Row: {
           address: string | null
+          bank_account_holder: string | null
+          bank_account_number: string | null
+          bank_name: string | null
           cashier_name: string | null
           category: Database["public"]["Enums"]["store_category"]
+          closing_hours: string | null
           created_at: string
+          dana_number: string | null
+          ewallet_number: string | null
+          gopay_number: string | null
           id: string
           name: string
+          opening_hours: string | null
+          ovo_number: string | null
           owner_id: string
           phone: string | null
+          shopeepay_number: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
           cashier_name?: string | null
           category: Database["public"]["Enums"]["store_category"]
+          closing_hours?: string | null
           created_at?: string
+          dana_number?: string | null
+          ewallet_number?: string | null
+          gopay_number?: string | null
           id?: string
           name: string
+          opening_hours?: string | null
+          ovo_number?: string | null
           owner_id: string
           phone?: string | null
+          shopeepay_number?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
+          bank_account_holder?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
           cashier_name?: string | null
           category?: Database["public"]["Enums"]["store_category"]
+          closing_hours?: string | null
           created_at?: string
+          dana_number?: string | null
+          ewallet_number?: string | null
+          gopay_number?: string | null
           id?: string
           name?: string
+          opening_hours?: string | null
+          ovo_number?: string | null
           owner_id?: string
           phone?: string | null
+          shopeepay_number?: string | null
           updated_at?: string
         }
         Relationships: []
