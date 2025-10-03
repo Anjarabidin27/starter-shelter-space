@@ -37,6 +37,10 @@ export const StoreSettings = () => {
     bank_account_number: '',
     bank_account_holder: '',
     ewallet_number: '',
+    gopay_number: '',
+    ovo_number: '',
+    dana_number: '',
+    shopeepay_number: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
@@ -55,6 +59,10 @@ export const StoreSettings = () => {
         bank_account_number: (currentStore as any).bank_account_number || '',
         bank_account_holder: (currentStore as any).bank_account_holder || '',
         ewallet_number: (currentStore as any).ewallet_number || '',
+        gopay_number: (currentStore as any).gopay_number || '',
+        ovo_number: (currentStore as any).ovo_number || '',
+        dana_number: (currentStore as any).dana_number || '',
+        shopeepay_number: (currentStore as any).shopeepay_number || '',
       });
     }
   }, [currentStore]);
@@ -275,18 +283,57 @@ export const StoreSettings = () => {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="ewallet_number" className="text-xs sm:text-sm">Nomor E-Wallet untuk QRIS</Label>
-                  <Input
-                    id="ewallet_number"
-                    value={formData.ewallet_number}
-                    onChange={(e) => handleInputChange('ewallet_number', e.target.value)}
-                    placeholder="Nomor telepon e-wallet (OVO, GoPay, Dana, dll)"
-                    className="h-9 sm:h-10 text-sm"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Nomor ini akan digunakan untuk generate kode QRIS
+                <div className="space-y-3">
+                  <div className="text-sm font-medium">Nomor E-Wallet</div>
+                  <p className="text-xs text-muted-foreground">
+                    Isi nomor telepon e-wallet yang terdaftar. QR code akan otomatis dibuat untuk pembayaran.
                   </p>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div>
+                      <Label htmlFor="gopay_number" className="text-xs sm:text-sm">GoPay</Label>
+                      <Input
+                        id="gopay_number"
+                        value={formData.gopay_number}
+                        onChange={(e) => handleInputChange('gopay_number', e.target.value)}
+                        placeholder="08xx xxxx xxxx"
+                        className="h-9 sm:h-10 text-sm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="ovo_number" className="text-xs sm:text-sm">OVO</Label>
+                      <Input
+                        id="ovo_number"
+                        value={formData.ovo_number}
+                        onChange={(e) => handleInputChange('ovo_number', e.target.value)}
+                        placeholder="08xx xxxx xxxx"
+                        className="h-9 sm:h-10 text-sm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="dana_number" className="text-xs sm:text-sm">DANA</Label>
+                      <Input
+                        id="dana_number"
+                        value={formData.dana_number}
+                        onChange={(e) => handleInputChange('dana_number', e.target.value)}
+                        placeholder="08xx xxxx xxxx"
+                        className="h-9 sm:h-10 text-sm"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="shopeepay_number" className="text-xs sm:text-sm">ShopeePay</Label>
+                      <Input
+                        id="shopeepay_number"
+                        value={formData.shopeepay_number}
+                        onChange={(e) => handleInputChange('shopeepay_number', e.target.value)}
+                        placeholder="08xx xxxx xxxx"
+                        className="h-9 sm:h-10 text-sm"
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
