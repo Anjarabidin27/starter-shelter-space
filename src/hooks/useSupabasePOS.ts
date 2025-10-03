@@ -117,7 +117,7 @@ export const useSupabasePOS = () => {
         photocopyRevenue: 0, // Legacy field, not used
         timestamp: new Date(receipt.created_at),
         paymentMethod: receipt.payment_method,
-        isManual: receipt.id.startsWith('MNL-')
+        isManual: (receipt.invoice_number?.startsWith('MNL-') ?? false)
       }));
 
       setReceipts(formattedReceipts);
@@ -232,7 +232,6 @@ export const useSupabasePOS = () => {
       const { data: receiptData, error: receiptError } = await supabase
         .from('receipts')
         .insert({
-          id: invoiceNumber,
           invoice_number: invoiceNumber,
           user_id: user.id,
           subtotal,
@@ -369,7 +368,6 @@ export const useSupabasePOS = () => {
       const { data: receiptData, error: receiptError } = await supabase
         .from('receipts')
         .insert({
-          id: invoiceNumber,
           invoice_number: invoiceNumber,
           user_id: user.id,
           subtotal: receipt.subtotal,
