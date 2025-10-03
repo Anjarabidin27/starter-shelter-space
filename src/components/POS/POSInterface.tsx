@@ -36,10 +36,14 @@ import {
   LogOut,
   Settings,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Scan
 } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 import { useStore } from '@/contexts/StoreContext';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 
 export const POSInterface = () => {
   const {
@@ -69,6 +73,7 @@ export const POSInterface = () => {
   const [currentTab, setCurrentTab] = useState('pos');
   const [showAdminProtection, setShowAdminProtection] = useState(false);
   const [pendingAdminAction, setPendingAdminAction] = useState<string | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
 
   // Global Enter key support for thermal printing
   useEffect(() => {
@@ -120,6 +125,9 @@ export const POSInterface = () => {
         break;
       case 'stock':
         setCurrentTab('stock');
+        break;
+      case 'low-stock':
+        setCurrentTab('low-stock');
         break;
     }
   };
@@ -360,6 +368,61 @@ Profit: ${formatPrice(receipt.profit)}
     return true;
   };
 
+  const handleBarcodeScanner = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      toast.error('Scan barcode hanya tersedia di aplikasi mobile');
+      return;
+    }
+
+    try {
+      setIsScanning(true);
+      
+      // Check permission
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      
+      if (!status.granted) {
+        toast.error('Izin kamera tidak diberikan');
+        setIsScanning(false);
+        return;
+      }
+
+      // Make background transparent
+      document.body.classList.add('scanner-active');
+      
+      // Start scanning
+      const result = await BarcodeScanner.startScan();
+      
+      // Remove transparency
+      document.body.classList.remove('scanner-active');
+      setIsScanning(false);
+
+      if (result.hasContent) {
+        // Search for product by barcode or code
+        const foundProduct = products.find(p => 
+          p.barcode?.toLowerCase() === result.content?.toLowerCase() ||
+          p.code?.toLowerCase() === result.content?.toLowerCase() ||
+          p.name.toLowerCase().includes(result.content?.toLowerCase() || '')
+        );
+
+        if (foundProduct) {
+          if (foundProduct.isPhotocopy && currentStore?.category === 'atk') {
+            handlePhotocopyClick(foundProduct);
+          } else {
+            addToCart(foundProduct, 1);
+          }
+          toast.success(`Produk "${foundProduct.name}" ditambahkan ke keranjang`);
+        } else {
+          toast.error(`Produk dengan kode "${result.content}" tidak ditemukan`);
+        }
+      }
+    } catch (error) {
+      console.error('Barcode scan error:', error);
+      document.body.classList.remove('scanner-active');
+      setIsScanning(false);
+      toast.error('Terjadi kesalahan saat scanning');
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-background">
       {/* Header */}
@@ -525,6 +588,9 @@ Profit: ${formatPrice(receipt.profit)}
             <TabsTrigger value="stock" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
               Stok
             </TabsTrigger>
+            <TabsTrigger value="low-stock" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
+              Stok Menipis
+            </TabsTrigger>
             <TabsTrigger value="receipt" className="text-xs px-2 py-2 sm:text-sm sm:px-3 sm:py-3 rounded-md">
               Nota
             </TabsTrigger>
@@ -550,8 +616,8 @@ Profit: ${formatPrice(receipt.profit)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 sm:p-6">
-                    <div className="mb-3 sm:mb-4">
-                      <div className="relative">
+                    <div className="mb-3 sm:mb-4 flex gap-2">
+                      <div className="relative flex-1">
                         <Search className="absolute left-3 top-2.5 sm:top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           placeholder="Cari produk..."
@@ -617,6 +683,18 @@ Profit: ${formatPrice(receipt.profit)}
                           </div>
                         )}
                       </div>
+                      
+                      {/* Barcode Scanner Button */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBarcodeScanner}
+                        disabled={isScanning}
+                        className="w-full sm:w-auto"
+                      >
+                        <Scan className="h-4 w-4 mr-2" />
+                        {isScanning ? 'Scanning...' : 'Scan Barcode'}
+                      </Button>
                     </div>
                     <div className="space-y-4">
                       {/* Layanan Fotocopy - only for ATK stores */}
