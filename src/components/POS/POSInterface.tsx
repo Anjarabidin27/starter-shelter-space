@@ -440,45 +440,33 @@ Profit: ${formatPrice(receipt.profit)}
       <header className="border-b bg-card shadow-sm w-full">
         <div className="w-full px-2 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="flex items-center gap-2">
-                <Store className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                <div>
-                  <div className="hidden sm:block">
-                    <h1 className="text-lg sm:text-2xl font-bold">
-                      Kasir {currentStore?.name || 'Toko'}
-                    </h1>
-                    {currentStore?.address && (
-                      <p className="text-xs sm:text-sm text-muted-foreground">
-                        {currentStore.address}
-                      </p>
-                    )}
-                    <p className="text-xs sm:text-sm text-primary font-medium">
-                      {getWelcomeMessage()}, {currentStore?.cashier_name || 'Admin Kasir'}
+            <Link to="/settings" className="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity cursor-pointer">
+              <Store className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <div>
+                <div className="hidden sm:block">
+                  <h1 className="text-lg sm:text-2xl font-bold">
+                    Kasir {currentStore?.name || 'Toko'}
+                  </h1>
+                  {currentStore?.address && (
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      {currentStore.address}
                     </p>
-                  </div>
-                  {/* Mobile compact header */}
-                  <div className="sm:hidden">
-                    <h1 className="text-sm font-bold">
-                      {currentStore?.name || 'Toko'}
-                    </h1>
-                    <p className="text-xs text-primary">
-                      {getWelcomeMessage()}
-                    </p>
-                  </div>
+                  )}
+                  <p className="text-xs sm:text-sm text-primary font-medium">
+                    {getWelcomeMessage()}, {currentStore?.cashier_name || 'Admin Kasir'}
+                  </p>
+                </div>
+                {/* Mobile compact header */}
+                <div className="sm:hidden">
+                  <h1 className="text-sm font-bold">
+                    {currentStore?.name || 'Toko'}
+                  </h1>
+                  <p className="text-xs text-primary">
+                    {getWelcomeMessage()}
+                  </p>
                 </div>
               </div>
-              <Link to="/settings">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span className="hidden sm:inline">Pengaturan</span>
-                </Button>
-              </Link>
-            </div>
+            </Link>
             
             <div className="flex items-center gap-1 sm:gap-4">
               {/* Mobile compact version */}
