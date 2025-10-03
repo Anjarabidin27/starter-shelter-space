@@ -228,10 +228,11 @@ export const useSupabasePOS = () => {
       const counter = (existingReceipts?.length || 0) + 1;
       const invoiceNumber = `INV-${counter}${dateStr}`;
 
-      // Create receipt with generated invoice number
+      // Create receipt with generated invoice number as id
       const { data: receiptData, error: receiptError } = await supabase
         .from('receipts')
         .insert({
+          id: invoiceNumber,
           invoice_number: invoiceNumber,
           user_id: user.id,
           subtotal,
@@ -364,10 +365,11 @@ export const useSupabasePOS = () => {
       const counter = (existingReceipts?.length || 0) + 1;
       const invoiceNumber = `MNL-${counter}${dateStr}`;
 
-      // Create manual receipt with generated invoice number
+      // Create manual receipt with generated invoice number as id
       const { data: receiptData, error: receiptError } = await supabase
         .from('receipts')
         .insert({
+          id: invoiceNumber,
           invoice_number: invoiceNumber,
           user_id: user.id,
           subtotal: receipt.subtotal,

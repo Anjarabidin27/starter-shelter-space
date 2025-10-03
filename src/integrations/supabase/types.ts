@@ -167,7 +167,7 @@ export type Database = {
         Insert: {
           created_at?: string
           discount?: number | null
-          id?: string
+          id: string
           invoice_number?: string | null
           payment_method?: string | null
           profit: number
