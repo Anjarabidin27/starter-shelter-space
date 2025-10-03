@@ -31,6 +31,12 @@ export const StoreSettings = () => {
     phone: '',
     address: '',
     cashier_name: '',
+    opening_hours: '',
+    closing_hours: '',
+    bank_name: '',
+    bank_account_number: '',
+    bank_account_holder: '',
+    ewallet_number: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
@@ -43,6 +49,12 @@ export const StoreSettings = () => {
         phone: currentStore.phone || '',
         address: currentStore.address || '',
         cashier_name: currentStore.cashier_name || '',
+        opening_hours: (currentStore as any).opening_hours || '',
+        closing_hours: (currentStore as any).closing_hours || '',
+        bank_name: (currentStore as any).bank_name || '',
+        bank_account_number: (currentStore as any).bank_account_number || '',
+        bank_account_holder: (currentStore as any).bank_account_holder || '',
+        ewallet_number: (currentStore as any).ewallet_number || '',
       });
     }
   }, [currentStore]);
@@ -193,6 +205,88 @@ export const StoreSettings = () => {
                     placeholder="Nama kasir"
                     className="h-9 sm:h-10 text-sm"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div>
+                    <Label htmlFor="opening_hours" className="text-xs sm:text-sm">Jam Buka</Label>
+                    <Input
+                      id="opening_hours"
+                      type="time"
+                      value={formData.opening_hours}
+                      onChange={(e) => handleInputChange('opening_hours', e.target.value)}
+                      placeholder="08:00"
+                      className="h-9 sm:h-10 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="closing_hours" className="text-xs sm:text-sm">Jam Tutup</Label>
+                    <Input
+                      id="closing_hours"
+                      type="time"
+                      value={formData.closing_hours}
+                      onChange={(e) => handleInputChange('closing_hours', e.target.value)}
+                      placeholder="21:00"
+                      className="h-9 sm:h-10 text-sm"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-base sm:text-lg">Informasi Pembayaran</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Pengaturan metode pembayaran untuk transaksi
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div>
+                  <Label htmlFor="bank_name" className="text-xs sm:text-sm">Nama Bank</Label>
+                  <Input
+                    id="bank_name"
+                    value={formData.bank_name}
+                    onChange={(e) => handleInputChange('bank_name', e.target.value)}
+                    placeholder="Contoh: BRI, BCA, Mandiri"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="bank_account_number" className="text-xs sm:text-sm">Nomor Rekening</Label>
+                  <Input
+                    id="bank_account_number"
+                    value={formData.bank_account_number}
+                    onChange={(e) => handleInputChange('bank_account_number', e.target.value)}
+                    placeholder="Nomor rekening bank"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="bank_account_holder" className="text-xs sm:text-sm">Nama Pemilik Rekening</Label>
+                  <Input
+                    id="bank_account_holder"
+                    value={formData.bank_account_holder}
+                    onChange={(e) => handleInputChange('bank_account_holder', e.target.value)}
+                    placeholder="Nama pemilik rekening"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="ewallet_number" className="text-xs sm:text-sm">Nomor E-Wallet untuk QRIS</Label>
+                  <Input
+                    id="ewallet_number"
+                    value={formData.ewallet_number}
+                    onChange={(e) => handleInputChange('ewallet_number', e.target.value)}
+                    placeholder="Nomor telepon e-wallet (OVO, GoPay, Dana, dll)"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Nomor ini akan digunakan untuk generate kode QRIS
+                  </p>
                 </div>
               </CardContent>
             </Card>
