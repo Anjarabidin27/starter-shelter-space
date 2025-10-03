@@ -616,8 +616,8 @@ Profit: ${formatPrice(receipt.profit)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="p-3 sm:p-6">
-                    <div className="mb-3 sm:mb-4 flex gap-2">
-                      <div className="relative flex-1">
+                    <div className="mb-3 sm:mb-4 space-y-2">
+                      <div className="relative">
                         <Search className="absolute left-3 top-2.5 sm:top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           placeholder="Cari produk..."
@@ -690,7 +690,7 @@ Profit: ${formatPrice(receipt.profit)}
                         size="sm"
                         onClick={handleBarcodeScanner}
                         disabled={isScanning}
-                        className="w-full sm:w-auto"
+                        className="w-full h-8 sm:h-10"
                       >
                         <Scan className="h-4 w-4 mr-2" />
                         {isScanning ? 'Scanning...' : 'Scan Barcode'}

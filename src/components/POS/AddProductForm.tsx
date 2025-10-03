@@ -234,14 +234,9 @@ export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], o
           <Plus className="h-5 w-5" />
           Tambah Produk/Layanan Baru
         </CardTitle>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleScanBarcode} disabled={isScanning}>
-            <Scan className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+        <Button variant="ghost" size="sm" onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
       </CardHeader>
       
       <CardContent>
@@ -361,14 +356,26 @@ export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], o
 
                 <div>
                   <Label htmlFor="barcode">Barcode (opsional)</Label>
-                  <Input
-                    id="barcode"
-                    type="text"
-                    value={formData.barcode}
-                    onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
-                    placeholder="Barcode untuk scanner"
-                    className="h-9 sm:h-10 text-sm"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="barcode"
+                      type="text"
+                      value={formData.barcode}
+                      onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                      placeholder="Barcode untuk scanner"
+                      className="h-9 sm:h-10 text-sm flex-1"
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleScanBarcode} 
+                      disabled={isScanning}
+                      className="h-9 sm:h-10"
+                    >
+                      <Scan className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="md:col-span-2">

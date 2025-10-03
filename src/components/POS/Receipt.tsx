@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Printer, Copy } from 'lucide-react';
+import { ArrowLeft, Printer } from 'lucide-react';
 import { thermalPrinter } from '@/lib/thermal-printer';
 import { formatThermalReceipt, formatPrintReceipt } from '@/lib/receipt-formatter';
 import { toast } from 'sonner';
@@ -65,11 +65,6 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
     }
   }, [receipt, formatPrice, currentStore]);
 
-  const handleCopyReceipt = useCallback(() => {
-    const receiptText = formatThermalReceipt(receipt, formatPrice, currentStore);
-    navigator.clipboard.writeText(receiptText);
-    toast.success('Struk berhasil disalin ke clipboard!');
-  }, [receipt, formatPrice, currentStore]);
 
   // Add Enter key support for thermal printing
   useEffect(() => {
@@ -96,16 +91,10 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
           )}
           <h2 className="text-xl font-semibold">Detail Struk</h2>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={handleCopyReceipt}>
-            <Copy className="h-4 w-4 mr-1" />
-            Salin
-          </Button>
-          <Button onClick={handleThermalPrint} size="sm">
-            <Printer className="h-4 w-4 mr-1" />
-            Print Thermal
-          </Button>
-        </div>
+        <Button onClick={handleThermalPrint} size="sm">
+          <Printer className="h-4 w-4 mr-1" />
+          Print Thermal
+        </Button>
       </div>
 
       {/* Konten struk */}
@@ -202,7 +191,6 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
             <ul className="space-y-1">
               <li>• Tekan <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Enter</kbd> untuk print thermal otomatis</li>
               <li>• Klik tombol "Print Thermal" untuk print manual</li>
-              <li>• Klik "Salin" untuk menyalin teks struk</li>
             </ul>
           </div>
         </CardContent>
