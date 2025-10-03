@@ -3,13 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Receipt as ReceiptIcon, Trash2, Plus, Camera, Scan } from 'lucide-react';
+import { Receipt as ReceiptIcon, Trash2, Plus, Scan } from 'lucide-react';
 import { Product, Receipt as ReceiptType, CartItem } from '@/types/pos';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
+import { PaymentMethodSelector } from './PaymentMethodSelector';
 
 interface QuickItem extends CartItem {
   id: string;
@@ -340,32 +339,19 @@ export const QuickInvoice = ({ onCreateInvoice, formatPrice, receipts, onPrintRe
           {/* Discount & Payment */}
           {items.length > 0 && (
             <div className="space-y-3 pt-3 border-t">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="discount" className="text-xs sm:text-sm">Diskon (Rp)</Label>
-                  <Input
-                    id="discount"
-                    type="number"
-                    min="0"
-                    value={discount}
-                    onChange={(e) => setDiscount(Number(e.target.value) || 0)}
-                    className="h-9 sm:h-10 text-sm"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="payment" className="text-xs sm:text-sm">Pembayaran</Label>
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger className="h-9 sm:h-10 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="transfer">Transfer</SelectItem>
-                      <SelectItem value="qris">QRIS</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div>
+                <Label htmlFor="discount" className="text-xs sm:text-sm">Diskon (Rp)</Label>
+                <Input
+                  id="discount"
+                  type="number"
+                  min="0"
+                  value={discount}
+                  onChange={(e) => setDiscount(Number(e.target.value) || 0)}
+                  className="h-9 sm:h-10 text-sm"
+                />
               </div>
+              
+              <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
 
               {/* Total */}
               <div className="space-y-2 p-3 bg-primary/5 rounded-md">

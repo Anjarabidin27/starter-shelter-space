@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useState } from 'react';
 import { Receipt as ReceiptType } from '@/types/pos';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { thermalPrinter } from '@/lib/thermal-printer';
 import { formatThermalReceipt, formatPrintReceipt } from '@/lib/receipt-formatter';
 import { toast } from 'sonner';
 import { useStore } from '@/contexts/StoreContext';
+import QRCode from 'qrcode';
 
 interface ReceiptProps {
   receipt: ReceiptType;
@@ -18,6 +19,7 @@ interface ReceiptProps {
 
 export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
   const { currentStore } = useStore();
+  const [paymentQrCode, setPaymentQrCode] = useState<string>('');
   
   const handleThermalPrint = useCallback(async () => {
     try {
@@ -65,6 +67,55 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
     }
   }, [receipt, formatPrice, currentStore]);
 
+
+  // Generate QR Code for payment info
+  useEffect(() => {
+    const generatePaymentQR = async () => {
+      const paymentMethod = receipt.paymentMethod?.toLowerCase() || 'cash';
+      
+      // Generate QR for transfer bank
+      if (paymentMethod === 'transfer' && currentStore?.bank_account_number && currentStore?.bank_name) {
+        const bankInfo = `Bank: ${currentStore.bank_name}\nNo. Rekening: ${currentStore.bank_account_number}\nAtas Nama: ${currentStore.bank_account_holder || '-'}`;
+        try {
+          const url = await QRCode.toDataURL(bankInfo, {
+            width: 200,
+            margin: 1,
+            color: { dark: '#000000', light: '#FFFFFF' }
+          });
+          setPaymentQrCode(url);
+        } catch (err) {
+          console.error('Error generating bank QR code:', err);
+        }
+      }
+      // Generate QR for e-wallet
+      else if (paymentMethod === 'ewallet') {
+        // Try to generate QR for available e-wallet
+        const ewallets = ['gopay', 'ovo', 'dana', 'shopeepay'];
+        for (const provider of ewallets) {
+          const phoneNumber = currentStore?.[`${provider}_number`];
+          if (phoneNumber) {
+            const cleanPhone = phoneNumber.replace(/\D/g, '');
+            const deepLink = `${provider}://pay?phone=${cleanPhone}`;
+            try {
+              const url = await QRCode.toDataURL(deepLink, {
+                width: 200,
+                margin: 1,
+                color: { dark: '#000000', light: '#FFFFFF' }
+              });
+              setPaymentQrCode(url);
+              break;
+            } catch (err) {
+              console.error(`Error generating ${provider} QR code:`, err);
+            }
+          }
+        }
+      } else {
+        setPaymentQrCode('');
+      }
+    };
+
+    generatePaymentQR();
+  }, [receipt.paymentMethod, currentStore]);
 
   // Add Enter key support for thermal printing
   useEffect(() => {
@@ -174,6 +225,25 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
               <span>{formatPrice(receipt.profit)}</span>
             </div>
           </div>
+
+          {/* Payment QR Code */}
+          {paymentQrCode && (
+            <div className="mt-4 pt-3 border-t">
+              <div className="text-xs font-medium text-center mb-2 text-muted-foreground">
+                QR Code Pembayaran
+              </div>
+              <div className="flex justify-center">
+                <img 
+                  src={paymentQrCode} 
+                  alt="QR Code Pembayaran"
+                  className="w-40 h-40 border-2 border-border rounded"
+                />
+              </div>
+              <div className="text-xs text-center text-muted-foreground italic mt-2">
+                Scan untuk melakukan pembayaran
+              </div>
+            </div>
+          )}
 
           {/* Footer */}
           <div className="text-center mt-4 pt-3 border-t text-xs text-muted-foreground">
