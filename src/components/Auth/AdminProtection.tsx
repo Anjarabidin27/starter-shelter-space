@@ -37,9 +37,8 @@ export const AdminProtection = ({
 
     if (password === ADMIN_PASSWORD) {
       toast.success('Akses admin berhasil!');
-      onSuccess();
-      onClose();
       setPassword('');
+      onSuccess();
     } else {
       setError('Kata sandi admin salah!');
     }
