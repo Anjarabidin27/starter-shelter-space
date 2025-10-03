@@ -64,9 +64,8 @@ export const POSInterface = () => {
 
   const { signOut } = useAuth();
   const { currentStore } = useStore();
-  const location = useLocation();
   const [lastReceipt, setLastReceipt] = useState<ReceiptType | null>(null);
-  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptType | null>(location.state?.viewReceipt || null);
+  const [selectedReceipt, setSelectedReceipt] = useState<ReceiptType | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [photocopyProduct, setPhotocopyProduct] = useState<Product | null>(null);
   const [showPhotocopyDialog, setShowPhotocopyDialog] = useState(false);
@@ -74,6 +73,18 @@ export const POSInterface = () => {
   const [showAdminProtection, setShowAdminProtection] = useState(false);
   const [pendingAdminAction, setPendingAdminAction] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
+
+  // Handle location state for viewing receipts from navigation
+  useEffect(() => {
+    try {
+      const state = (window.history.state && window.history.state.usr) as any;
+      if (state?.viewReceipt) {
+        setSelectedReceipt(state.viewReceipt);
+      }
+    } catch (error) {
+      console.log('No receipt from navigation state');
+    }
+  }, []);
 
   // Global Enter key support for thermal printing
   useEffect(() => {
