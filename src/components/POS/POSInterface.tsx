@@ -39,17 +39,11 @@ import {
   AlertTriangle,
   Scan
 } from 'lucide-react';
-import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useStore } from '@/contexts/StoreContext';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export const POSInterface = () => {
   const {
@@ -71,7 +65,6 @@ export const POSInterface = () => {
   const { signOut } = useAuth();
   const { currentStore } = useStore();
   const location = useLocation();
-  const navigate = useNavigate();
   const [lastReceipt, setLastReceipt] = useState<ReceiptType | null>(null);
   const [selectedReceipt, setSelectedReceipt] = useState<ReceiptType | null>(location.state?.viewReceipt || null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -437,46 +430,43 @@ Profit: ${formatPrice(receipt.profit)}
         <div className="w-full px-2 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 sm:gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-muted p-2">
-                    <Store className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                    <div>
-                      <div className="hidden sm:block text-left">
-                        <h1 className="text-lg sm:text-2xl font-bold">
-                          Kasir {currentStore?.name || 'Toko'}
-                        </h1>
-                        {currentStore?.address && (
-                          <p className="text-xs sm:text-sm text-muted-foreground">
-                            {currentStore.address}
-                          </p>
-                        )}
-                        <p className="text-xs sm:text-sm text-primary font-medium">
-                          {getWelcomeMessage()}, {currentStore?.cashier_name || 'Admin Kasir'}
-                        </p>
-                      </div>
-                      {/* Mobile compact header */}
-                      <div className="sm:hidden text-left">
-                        <h1 className="text-sm font-bold">
-                          {currentStore?.name || 'Toko'}
-                        </h1>
-                        <p className="text-xs text-primary">
-                          {getWelcomeMessage()}
-                        </p>
-                      </div>
-                    </div>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 bg-popover">
-                  <DropdownMenuItem 
-                    onClick={() => navigate('/settings')}
-                    className="cursor-pointer"
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Pengaturan Toko</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="flex items-center gap-2">
+                <Store className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+                <div>
+                  <div className="hidden sm:block">
+                    <h1 className="text-lg sm:text-2xl font-bold">
+                      Kasir {currentStore?.name || 'Toko'}
+                    </h1>
+                    {currentStore?.address && (
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        {currentStore.address}
+                      </p>
+                    )}
+                    <p className="text-xs sm:text-sm text-primary font-medium">
+                      {getWelcomeMessage()}, {currentStore?.cashier_name || 'Admin Kasir'}
+                    </p>
+                  </div>
+                  {/* Mobile compact header */}
+                  <div className="sm:hidden">
+                    <h1 className="text-sm font-bold">
+                      {currentStore?.name || 'Toko'}
+                    </h1>
+                    <p className="text-xs text-primary">
+                      {getWelcomeMessage()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Link to="/settings">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">Pengaturan</span>
+                </Button>
+              </Link>
             </div>
             
             <div className="flex items-center gap-1 sm:gap-4">
