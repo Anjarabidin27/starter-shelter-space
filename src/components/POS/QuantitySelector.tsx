@@ -126,7 +126,7 @@ export const QuantitySelector = ({
         
         <Input
           type="number"
-          value={quantity === 0 ? '' : quantity}
+          value={quantity || ''}
           onChange={handleQuantityInputChange}
           onKeyDown={handleKeyDown}
           onFocus={(e) => e.target.select()}
@@ -171,6 +171,7 @@ export const QuantitySelector = ({
               type="number"
               value={unitQuantity || ''}
               onChange={(e) => handleUnitQuantityChange(parseInt(e.target.value) || 0)}
+              onFocus={(e) => e.target.select()}
               className="h-8 w-16 text-center text-sm"
               min="0"
               placeholder="0"
@@ -229,7 +230,7 @@ export const QuantitySelector = ({
           </Label>
           <Input
             type="number"
-            value={customPrice}
+            value={customPrice || ''}
             onChange={(e) => handlePriceChange(e.target.value)}
             className="h-8 text-sm"
             placeholder="Harga per lusin"

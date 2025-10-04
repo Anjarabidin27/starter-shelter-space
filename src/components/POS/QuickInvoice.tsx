@@ -10,6 +10,13 @@ import { CartItem, Receipt } from '@/types/pos';
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 import { Capacitor } from '@capacitor/core';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 
 interface QuickInvoiceProps {
   onCreateInvoice: (receipt: Receipt) => void;
@@ -41,7 +48,11 @@ export const QuickInvoice = ({
 }: QuickInvoiceProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [showQuantityDialog, setShowQuantityDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [quantityInput, setQuantityInput] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const quantityInputRef = useRef<HTMLInputElement>(null);
 
   // Filter products based on search
   const filteredProducts = products.filter(p => {
@@ -57,10 +68,31 @@ export const QuickInvoice = ({
   }, []);
 
   const handleProductSelect = (product: Product) => {
-    addToCart(product, 1);
-    setSearchTerm('');
-    searchInputRef.current?.focus();
+    setSelectedProduct(product);
+    setQuantityInput('');
+    setShowQuantityDialog(true);
   };
+
+  const handleQuantityConfirm = () => {
+    if (selectedProduct) {
+      const qty = parseInt(quantityInput) || 1;
+      addToCart(selectedProduct, qty);
+      setShowQuantityDialog(false);
+      setSelectedProduct(null);
+      setQuantityInput('');
+      setSearchTerm('');
+      searchInputRef.current?.focus();
+    }
+  };
+
+  useEffect(() => {
+    if (showQuantityDialog && quantityInputRef.current) {
+      setTimeout(() => {
+        quantityInputRef.current?.focus();
+        quantityInputRef.current?.select();
+      }, 100);
+    }
+  }, [showQuantityDialog]);
 
   const handleBarcodeScanner = async () => {
     if (!Capacitor.isNativePlatform()) {
@@ -114,8 +146,53 @@ export const QuickInvoice = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Product Search - Simplified for quick entry */}
+    <>
+      <Dialog open={showQuantityDialog} onOpenChange={setShowQuantityDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Masukkan Jumlah</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium">Produk</Label>
+              <p className="text-sm text-muted-foreground mt-1">{selectedProduct?.name}</p>
+            </div>
+            <div>
+              <Label htmlFor="quantity-input" className="text-sm font-medium">
+                Jumlah
+              </Label>
+              <Input
+                ref={quantityInputRef}
+                id="quantity-input"
+                type="number"
+                value={quantityInput}
+                onChange={(e) => setQuantityInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleQuantityConfirm();
+                  }
+                }}
+                placeholder="0"
+                className="mt-1"
+                min="1"
+                inputMode="numeric"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowQuantityDialog(false)}>
+              Batal
+            </Button>
+            <Button onClick={handleQuantityConfirm}>
+              Tambahkan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Product Search - Simplified for quick entry */}
       <div className="lg:col-span-2">
         <Card>
           <CardHeader>
@@ -207,5 +284,6 @@ export const QuickInvoice = ({
         />
       </div>
     </div>
+    </>
   );
 };
