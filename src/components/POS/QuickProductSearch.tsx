@@ -26,10 +26,15 @@ export const QuickProductSearch = ({ products, onAddToCart, formatPrice }: Quick
       const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
       const productName = product.name.toLowerCase();
       const productCategory = product.category?.toLowerCase() || '';
+      const productCode = product.code?.toLowerCase() || '';
+      const productBarcode = product.barcode?.toLowerCase() || '';
       
-      // Check if all search words are found in product name or category
+      // Check if all search words are found in product name, code, barcode, or category
       return searchWords.every(word => 
-        productName.includes(word) || productCategory.includes(word)
+        productName.includes(word) || 
+        productCategory.includes(word) ||
+        productCode.includes(word) ||
+        productBarcode.includes(word)
       );
     })
     .slice(0, 5); // Limit to 5 results

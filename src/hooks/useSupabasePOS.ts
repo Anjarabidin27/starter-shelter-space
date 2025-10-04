@@ -54,6 +54,7 @@ export const useSupabasePOS = () => {
         costPrice: Number(item.cost_price),
         sellPrice: Number(item.sell_price),
         stock: item.stock,
+        code: (item as any).code || undefined,
         barcode: item.barcode,
         category: item.category,
         isPhotocopy: item.is_photocopy
@@ -148,6 +149,7 @@ export const useSupabasePOS = () => {
           cost_price: productData.costPrice,
           sell_price: productData.sellPrice,
           stock: productData.stock,
+          code: productData.code,
           barcode: productData.barcode,
           category: productData.category || 'General',
           is_photocopy: productData.isPhotocopy || false,
@@ -169,6 +171,7 @@ export const useSupabasePOS = () => {
       if (updates.costPrice !== undefined) updateData.cost_price = updates.costPrice;
       if (updates.sellPrice !== undefined) updateData.sell_price = updates.sellPrice;
       if (updates.stock !== undefined) updateData.stock = updates.stock;
+      if (updates.code !== undefined) updateData.code = updates.code;
       if (updates.barcode !== undefined) updateData.barcode = updates.barcode;
       if (updates.category !== undefined) updateData.category = updates.category;
       if (updates.isPhotocopy !== undefined) updateData.is_photocopy = updates.isPhotocopy;
