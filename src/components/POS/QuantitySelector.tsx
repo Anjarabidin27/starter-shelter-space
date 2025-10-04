@@ -126,7 +126,7 @@ export const QuantitySelector = ({
         
         <Input
           type="number"
-          value={quantity === 0 ? '' : quantity}
+          value={quantity || ''}
           onChange={handleQuantityInputChange}
           onKeyDown={handleKeyDown}
           onFocus={(e) => e.target.select()}
@@ -169,7 +169,7 @@ export const QuantitySelector = ({
           <div className="flex items-center gap-2">
             <Input
               type="number"
-              value={unitQuantity === 0 ? '' : unitQuantity}
+              value={unitQuantity || ''}
               onChange={(e) => handleUnitQuantityChange(parseInt(e.target.value) || 0)}
               onFocus={(e) => e.target.select()}
               className="h-8 w-16 text-center text-sm"

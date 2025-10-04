@@ -29,9 +29,42 @@ export const ProductGrid = ({ products, onAddToCart, onPhotocopyClick }: Product
   };
 
   const handleAddToCart = (product: Product) => {
+    // Check if stock is available
+    if (product.stock <= 0 && !product.isPhotocopy) {
+      import('sonner').then(({ toast }) => {
+        toast.error('Barang Kosong', {
+          description: `Stok ${product.name} tidak tersedia`,
+          duration: 3000,
+        });
+      });
+      return;
+    }
+
     // Use getTotalQuantity if available, otherwise use base quantity
     const getTotalQuantity = getTotalQuantityRefs[product.id];
-    const quantity = getTotalQuantity ? getTotalQuantity() : (quantities[product.id] || 1);
+    const quantity = getTotalQuantity ? getTotalQuantity() : (quantities[product.id] || 0);
+    
+    // Check if quantity is entered
+    if (quantity <= 0) {
+      import('sonner').then(({ toast }) => {
+        toast.warning('Isi Jumlahnya Dulu', {
+          description: 'Masukkan jumlah barang yang ingin ditambahkan',
+          duration: 3000,
+        });
+      });
+      return;
+    }
+
+    // Check if quantity exceeds stock
+    if (quantity > product.stock && !product.isPhotocopy) {
+      import('sonner').then(({ toast }) => {
+        toast.error('Stok Tidak Cukup', {
+          description: `Stok ${product.name} hanya tersisa ${product.stock}`,
+          duration: 3000,
+        });
+      });
+      return;
+    }
     
     onAddToCart(product, quantity);
     setQuantities(prev => ({ ...prev, [product.id]: 0 }));
