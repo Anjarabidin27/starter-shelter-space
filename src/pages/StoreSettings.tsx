@@ -88,7 +88,7 @@ export const StoreSettings = () => {
       bank_name: formData.bank_name,
       bank_account_number: formData.bank_account_number,
       bank_account_holder: formData.bank_account_holder,
-      // qris_image_url disimpan via storage & localStorage sementara
+      qris_image_url: formData.qris_image_url,
       whatsapp_number: formData.whatsapp_number,
       admin_password: formData.admin_password,
       settings_password: formData.settings_password,
@@ -154,10 +154,20 @@ export const StoreSettings = () => {
       const json = await resp.json();
       if (!json.publicUrl) throw new Error('publicUrl not returned');
 
-      // Persist only in localStorage for now (DB kolom belum ada)
-      localStorage.setItem(`qrisUrl:${currentStore.id}`, json.publicUrl as string);
+      // Simpan URL ke database
+      const publicUrl = json.publicUrl as string;
+      const { error: updateError } = await supabase
+        .from('stores')
+        .update({ qris_image_url: publicUrl } as any)
+        .eq('id', currentStore.id);
 
-      toast({ title: 'Sukses', description: 'QRIS berhasil diupload dan diproses' });
+      if (updateError) throw updateError;
+
+      // Update local state dan localStorage
+      setFormData(prev => ({ ...prev, qris_image_url: publicUrl }));
+      localStorage.setItem(`qrisUrl:${currentStore.id}`, publicUrl);
+
+      toast({ title: 'Sukses', description: 'QRIS berhasil diupload dan disimpan ke database' });
     } catch (err) {
       console.error('QRIS upload error:', err);
       toast({ title: 'Error', description: 'Gagal memproses/mengupload QRIS', variant: 'destructive' });
@@ -166,11 +176,29 @@ export const StoreSettings = () => {
     }
   };
 
-  const handleRemoveQris = () => {
+  const handleRemoveQris = async () => {
     if (!currentStore) return;
-    localStorage.removeItem(`qrisUrl:${currentStore.id}`);
-    setQrisFullPreview('');
-    setQrisCroppedPreview('');
+    
+    try {
+      // Hapus dari database
+      const { error } = await supabase
+        .from('stores')
+        .update({ qris_image_url: null } as any)
+        .eq('id', currentStore.id);
+
+      if (error) throw error;
+
+      // Hapus dari localStorage dan state
+      localStorage.removeItem(`qrisUrl:${currentStore.id}`);
+      setFormData(prev => ({ ...prev, qris_image_url: '' }));
+      setQrisFullPreview('');
+      setQrisCroppedPreview('');
+
+      toast({ title: 'Sukses', description: 'QRIS berhasil dihapus' });
+    } catch (err) {
+      console.error('Remove QRIS error:', err);
+      toast({ title: 'Error', description: 'Gagal menghapus QRIS', variant: 'destructive' });
+    }
   };
 
   if (!currentStore) {
