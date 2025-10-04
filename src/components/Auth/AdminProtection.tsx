@@ -48,9 +48,10 @@ export const AdminProtection = ({
       const successMsg = useSettingsPassword ? 'Akses pengaturan berhasil!' : 'Akses admin berhasil!';
       toast.success(successMsg);
       setPassword('');
+      setError('');
       setIsLoading(false);
       onSuccess();
-      handleClose(); // Auto close after success
+      // Don't call handleClose() here - let parent handle the success state
     } else {
       const errorMsg = useSettingsPassword ? 'Kode pengaturan salah!' : 'Kata sandi admin salah!';
       setError(errorMsg);

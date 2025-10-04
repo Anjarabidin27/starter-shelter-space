@@ -119,27 +119,24 @@ export const QuickInvoice = ({
       <div className="lg:col-span-2">
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <ReceiptIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-                Nota Cepat - Cari Produk
-              </CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBarcodeScanner}
-                disabled={isScanning}
-                className="h-8"
-              >
-                <Scan className="h-4 w-4 mr-2" />
-                {isScanning ? 'Scanning...' : 'Scan'}
-              </Button>
-            </div>
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <ReceiptIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+              Nota Cepat - Cari Produk
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="search" className="text-xs sm:text-sm">Cari Produk (Nama/Kode/Barcode)</Label>
+                <Button
+                  variant="outline"
+                  onClick={handleBarcodeScanner}
+                  disabled={isScanning}
+                  className="w-full h-10 mb-2"
+                >
+                  <Scan className="h-4 w-4 mr-2" />
+                  {isScanning ? 'Sedang Scanning...' : 'Scan Barcode'}
+                </Button>
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
