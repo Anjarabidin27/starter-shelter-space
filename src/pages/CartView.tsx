@@ -10,6 +10,7 @@ import { thermalPrinter } from '@/lib/thermal-printer';
 import { formatThermalReceipt, formatPrintReceipt } from '@/lib/receipt-formatter';
 import { usePOSContext } from '@/contexts/POSContext';
 import { useToast } from '@/hooks/use-toast';
+import { PaymentMethodSelector } from '@/components/POS/PaymentMethodSelector';
 
 export const CartView = () => {
   const navigate = useNavigate();
@@ -21,10 +22,12 @@ export const CartView = () => {
     return sum + (price * item.quantity);
   }, 0);
 
+  const [paymentMethod, setPaymentMethod] = useState('cash');
+
   const handleCheckout = async () => {
     if (cart.length === 0) return;
     
-    const receipt = await processTransaction('cash', 0);
+    const receipt = await processTransaction(paymentMethod, 0);
     if (receipt) {
       toast({
         title: "Transaksi Berhasil",
@@ -188,6 +191,14 @@ export const CartView = () => {
                     <span>Total:</span>
                     <span className="text-primary">{formatPrice(subtotal)}</span>
                   </div>
+                  
+                  <Separator />
+                  
+                  <PaymentMethodSelector 
+                    value={paymentMethod}
+                    onChange={setPaymentMethod}
+                  />
+                  
                   <div className="space-y-2">
                     <Button 
                       className="w-full" 

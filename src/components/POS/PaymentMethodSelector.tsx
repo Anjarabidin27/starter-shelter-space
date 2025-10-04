@@ -179,19 +179,19 @@ export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelector
         <Card className="p-3 bg-muted/50 border-primary/20">
           <div className="space-y-3">
             <div className="text-xs font-medium text-muted-foreground text-center">
-              Scan QRIS untuk Pembayaran
+              Kode QRIS untuk Pembayaran
             </div>
             
             <div className="flex justify-center">
               <img 
                 src={currentStore?.qris_image_url} 
-                alt="QRIS"
-                className="w-48 h-48 sm:w-64 sm:h-64 object-contain border-2 border-border rounded"
+                alt="QRIS Code"
+                className="max-w-[280px] w-full h-auto object-contain border-2 border-border rounded p-2 bg-white"
               />
             </div>
             
             <div className="text-xs text-center text-muted-foreground italic">
-              Scan dengan aplikasi pembayaran apapun yang mendukung QRIS
+              Scan kode QRIS di atas dengan aplikasi pembayaran apapun
             </div>
           </div>
         </Card>

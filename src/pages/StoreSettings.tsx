@@ -41,10 +41,6 @@ export const StoreSettings = () => {
     whatsapp_number: '',
     admin_password: '',
     settings_password: '',
-    gopay_number: '',
-    ovo_number: '',
-    dana_number: '',
-    shopeepay_number: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
@@ -69,10 +65,6 @@ export const StoreSettings = () => {
         whatsapp_number: (currentStore as any).whatsapp_number || '',
         admin_password: (currentStore as any).admin_password || '122344566',
         settings_password: (currentStore as any).settings_password || '12234566',
-        gopay_number: (currentStore as any).gopay_number || '',
-        ovo_number: (currentStore as any).ovo_number || '',
-        dana_number: (currentStore as any).dana_number || '',
-        shopeepay_number: (currentStore as any).shopeepay_number || '',
       });
     }
   }, [currentStore]);
@@ -82,8 +74,8 @@ export const StoreSettings = () => {
 
     setIsSaving(true);
 
-    // Build payload with only columns that are guaranteed to exist.
-    const basePayload: Record<string, any> = {
+    // Only send fields that exist in formData
+    const payload: Record<string, any> = {
       name: formData.name,
       category: formData.category,
       phone: formData.phone,
@@ -99,23 +91,6 @@ export const StoreSettings = () => {
       admin_password: formData.admin_password,
       settings_password: formData.settings_password,
     };
-
-    // Include e-wallet fields only if they exist in currentStore schema (avoids DB errors)
-    const optionalKeys = ['gopay_number', 'ovo_number', 'dana_number', 'shopeepay_number'] as const;
-    const optionalPayload: Record<string, any> = {};
-    optionalKeys.forEach((key) => {
-      if (key in (currentStore as any)) {
-        optionalPayload[key] = (formData as any)[key] || '';
-      }
-    });
-
-    // Dynamically include only keys that exist on currentStore to avoid unknown-column errors
-    const payload: Record<string, any> = {};
-    Object.keys(formData).forEach((key) => {
-      if (key in (currentStore as any)) {
-        (payload as any)[key] = (formData as any)[key as keyof typeof formData];
-      }
-    });
 
     const success = await updateStore(currentStore.id, payload);
     if (success) {
@@ -437,9 +412,9 @@ export const StoreSettings = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="text-sm font-medium">Gambar QRIS</div>
+                  <div className="text-sm font-medium">Kode QRIS</div>
                   <p className="text-xs text-muted-foreground">
-                    Upload gambar QRIS asli Anda untuk pembayaran. Gambar akan ditampilkan pada nota dan checkout.
+                    Upload gambar kode QRIS. Hanya kode QRIS yang akan ditampilkan saat pembayaran.
                   </p>
                   
                   {formData.qris_image_url ? (
@@ -447,8 +422,8 @@ export const StoreSettings = () => {
                       <div className="relative inline-block">
                         <img 
                           src={formData.qris_image_url} 
-                          alt="QRIS" 
-                          className="w-48 h-48 object-contain border rounded-lg"
+                          alt="Kode QRIS" 
+                          className="max-w-[200px] w-full h-auto object-contain border rounded-lg p-2 bg-white"
                         />
                         <Button
                           type="button"
@@ -460,6 +435,9 @@ export const StoreSettings = () => {
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
+                      <p className="text-xs text-muted-foreground italic">
+                        Kode QRIS berhasil diupload. Klik tombol Simpan untuk menyimpan ke database.
+                      </p>
                     </div>
                   ) : (
                     <div>
@@ -467,7 +445,7 @@ export const StoreSettings = () => {
                         <div className="border-2 border-dashed border-border rounded-lg p-6 hover:border-primary transition-colors text-center">
                           <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                           <p className="text-sm text-muted-foreground">
-                            {uploadingQris ? 'Mengupload...' : 'Klik untuk upload gambar QRIS'}
+                            {uploadingQris ? 'Mengupload...' : 'Klik untuk upload kode QRIS'}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
                             PNG, JPG, maksimal 5MB
@@ -564,59 +542,6 @@ export const StoreSettings = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-border">
-              <CardHeader className="pb-3 sm:pb-6">
-                <CardTitle className="text-base sm:text-lg">Nomor E-Wallet</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
-                  Nomor e-wallet untuk pembayaran digital
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4">
-                <div>
-                  <Label htmlFor="gopay_number" className="text-xs sm:text-sm">Nomor GoPay</Label>
-                  <Input
-                    id="gopay_number"
-                    value={formData.gopay_number}
-                    onChange={(e) => handleInputChange('gopay_number', e.target.value)}
-                    placeholder="08xx xxxx xxxx"
-                    className="h-9 sm:h-10 text-sm"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="ovo_number" className="text-xs sm:text-sm">Nomor OVO</Label>
-                  <Input
-                    id="ovo_number"
-                    value={formData.ovo_number}
-                    onChange={(e) => handleInputChange('ovo_number', e.target.value)}
-                    placeholder="08xx xxxx xxxx"
-                    className="h-9 sm:h-10 text-sm"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="dana_number" className="text-xs sm:text-sm">Nomor DANA</Label>
-                  <Input
-                    id="dana_number"
-                    value={formData.dana_number}
-                    onChange={(e) => handleInputChange('dana_number', e.target.value)}
-                    placeholder="08xx xxxx xxxx"
-                    className="h-9 sm:h-10 text-sm"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="shopeepay_number" className="text-xs sm:text-sm">Nomor ShopeePay</Label>
-                  <Input
-                    id="shopeepay_number"
-                    value={formData.shopeepay_number}
-                    onChange={(e) => handleInputChange('shopeepay_number', e.target.value)}
-                    placeholder="08xx xxxx xxxx"
-                    className="h-9 sm:h-10 text-sm"
-                  />
-                </div>
-              </CardContent>
-            </Card>
 
             <div className="flex justify-end pt-2">
               <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto sm:min-w-32 h-9 sm:h-10">

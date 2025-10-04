@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ArrowLeft, Search } from 'lucide-react';
 import { TransactionHistory } from '@/components/Reports/TransactionHistory';
 import { Receipt as ReceiptComponent } from '@/components/POS/Receipt';
 import { usePOSContext } from '@/contexts/POSContext';
@@ -11,6 +12,7 @@ import { Link } from 'react-router-dom';
 export const ReportsPage = () => {
   const { receipts, formatPrice } = usePOSContext();
   const [viewingReceipt, setViewingReceipt] = useState<Receipt | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleViewReceipt = (receipt: Receipt) => {
     setViewingReceipt(receipt);
@@ -74,9 +76,33 @@ export const ReportsPage = () => {
             </Link>
           </div>
 
+          {/* Search Box */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Cari invoice, produk, atau tanggal..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
           <div className="overflow-x-auto">
             <TransactionHistory
-              receipts={receipts.filter(receipt => !receipt.isManual && !receipt.id.startsWith('MNL-'))}
+              receipts={receipts.filter(receipt => {
+                if (receipt.isManual || receipt.id.startsWith('MNL-')) return false;
+                if (!searchQuery) return true;
+                
+                const query = searchQuery.toLowerCase();
+                const matchesId = receipt.id.toLowerCase().includes(query);
+                const matchesDate = new Date(receipt.timestamp).toLocaleDateString('id-ID').includes(query);
+                const matchesProducts = receipt.items.some(item => 
+                  item.product.name.toLowerCase().includes(query)
+                );
+                
+                return matchesId || matchesDate || matchesProducts;
+              })}
               formatPrice={formatPrice}
               onViewReceipt={handleViewReceipt}
               onPrintReceipt={handlePrintReceipt}
