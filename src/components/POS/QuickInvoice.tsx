@@ -70,6 +70,12 @@ export const QuickInvoice = ({
   }, []);
 
   const handleProductSelect = (product: Product) => {
+    // Check if product has stock (except for photocopy services)
+    if (!product.isPhotocopy && product.stock <= 0) {
+      toast.error(`Produk "${product.name}" tidak tersedia (stok habis)`);
+      return;
+    }
+    
     setSelectedProduct(product);
     setQuantityInput('');
     setShowQuantityDialog(true);
@@ -78,6 +84,18 @@ export const QuickInvoice = ({
   const handleQuantityConfirm = () => {
     if (selectedProduct) {
       const qty = parseInt(quantityInput) || 1;
+      
+      // Validate stock (except for photocopy services)
+      if (!selectedProduct.isPhotocopy && qty > selectedProduct.stock) {
+        toast.error(`Stok tidak mencukupi! Tersedia: ${selectedProduct.stock}, Diminta: ${qty}`);
+        return;
+      }
+      
+      if (qty <= 0) {
+        toast.error('Jumlah harus lebih dari 0');
+        return;
+      }
+      
       addToCart(selectedProduct, qty);
       setShowQuantityDialog(false);
       setSelectedProduct(null);
