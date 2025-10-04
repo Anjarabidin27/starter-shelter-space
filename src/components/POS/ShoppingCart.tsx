@@ -112,17 +112,21 @@ export const ShoppingCart = ({
     setIsProcessing(true);
     
     try {
-      // If not connected, try to connect first
+      // Check if already connected
       if (!isConnected) {
+        toast.info('Menghubungkan ke printer...');
         const connected = await connect();
         if (!connected) {
           toast.error('Gagal terhubung ke printer thermal. Pastikan printer menyala dan dalam jangkauan.');
+          setIsProcessing(false);
           return;
         }
       }
 
+      // Process transaction
       const receipt = await processTransaction(paymentMethod, discountAmount);
       if (receipt) {
+        // Print directly since we're already connected
         try {
           const thermalContent = formatThermalReceipt(receipt, formatPrice);
           const success = await thermalPrinter.print(thermalContent);
@@ -133,7 +137,7 @@ export const ShoppingCart = ({
             setDiscount(0);
             setDiscountType('amount');
           } else {
-            toast.error('Gagal mencetak nota. Pastikan printer terhubung.');
+            toast.error('Gagal mencetak nota. Printer mungkin terputus.');
           }
         } catch (error) {
           console.error('Print error:', error);
