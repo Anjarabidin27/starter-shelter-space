@@ -41,6 +41,10 @@ export const StoreSettings = () => {
     whatsapp_number: '',
     admin_password: '',
     settings_password: '',
+    gopay_number: '',
+    ovo_number: '',
+    dana_number: '',
+    shopeepay_number: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
@@ -65,6 +69,10 @@ export const StoreSettings = () => {
         whatsapp_number: (currentStore as any).whatsapp_number || '',
         admin_password: (currentStore as any).admin_password || '122344566',
         settings_password: (currentStore as any).settings_password || '12234566',
+        gopay_number: (currentStore as any).gopay_number || '',
+        ovo_number: (currentStore as any).ovo_number || '',
+        dana_number: (currentStore as any).dana_number || '',
+        shopeepay_number: (currentStore as any).shopeepay_number || '',
       });
     }
   }, [currentStore]);
@@ -391,7 +399,7 @@ export const StoreSettings = () => {
                             {uploadingQris ? 'Mengupload...' : 'Klik untuk upload gambar QRIS'}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            PNG, JPG, maksimal 2MB
+                            PNG, JPG, maksimal 5MB
                           </p>
                         </div>
                       </Label>
@@ -481,6 +489,60 @@ export const StoreSettings = () => {
                   <p className="text-xs text-muted-foreground mt-1">
                     Kode untuk mengakses menu pengaturan toko
                   </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-base sm:text-lg">Nomor E-Wallet</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Nomor e-wallet untuk pembayaran digital
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div>
+                  <Label htmlFor="gopay_number" className="text-xs sm:text-sm">Nomor GoPay</Label>
+                  <Input
+                    id="gopay_number"
+                    value={formData.gopay_number}
+                    onChange={(e) => handleInputChange('gopay_number', e.target.value)}
+                    placeholder="08xx xxxx xxxx"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="ovo_number" className="text-xs sm:text-sm">Nomor OVO</Label>
+                  <Input
+                    id="ovo_number"
+                    value={formData.ovo_number}
+                    onChange={(e) => handleInputChange('ovo_number', e.target.value)}
+                    placeholder="08xx xxxx xxxx"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="dana_number" className="text-xs sm:text-sm">Nomor DANA</Label>
+                  <Input
+                    id="dana_number"
+                    value={formData.dana_number}
+                    onChange={(e) => handleInputChange('dana_number', e.target.value)}
+                    placeholder="08xx xxxx xxxx"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="shopeepay_number" className="text-xs sm:text-sm">Nomor ShopeePay</Label>
+                  <Input
+                    id="shopeepay_number"
+                    value={formData.shopeepay_number}
+                    onChange={(e) => handleInputChange('shopeepay_number', e.target.value)}
+                    placeholder="08xx xxxx xxxx"
+                    className="h-9 sm:h-10 text-sm"
+                  />
                 </div>
               </CardContent>
             </Card>
