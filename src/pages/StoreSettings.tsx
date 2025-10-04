@@ -81,7 +81,43 @@ export const StoreSettings = () => {
     if (!currentStore) return;
 
     setIsSaving(true);
-    const success = await updateStore(currentStore.id, formData);
+
+    // Build payload with only columns that are guaranteed to exist.
+    const basePayload: Record<string, any> = {
+      name: formData.name,
+      category: formData.category,
+      phone: formData.phone,
+      address: formData.address,
+      cashier_name: formData.cashier_name,
+      opening_hours: formData.opening_hours,
+      closing_hours: formData.closing_hours,
+      bank_name: formData.bank_name,
+      bank_account_number: formData.bank_account_number,
+      bank_account_holder: formData.bank_account_holder,
+      qris_image_url: formData.qris_image_url,
+      whatsapp_number: formData.whatsapp_number,
+      admin_password: formData.admin_password,
+      settings_password: formData.settings_password,
+    };
+
+    // Include e-wallet fields only if they exist in currentStore schema (avoids DB errors)
+    const optionalKeys = ['gopay_number', 'ovo_number', 'dana_number', 'shopeepay_number'] as const;
+    const optionalPayload: Record<string, any> = {};
+    optionalKeys.forEach((key) => {
+      if (key in (currentStore as any)) {
+        optionalPayload[key] = (formData as any)[key] || '';
+      }
+    });
+
+    // Dynamically include only keys that exist on currentStore to avoid unknown-column errors
+    const payload: Record<string, any> = {};
+    Object.keys(formData).forEach((key) => {
+      if (key in (currentStore as any)) {
+        (payload as any)[key] = (formData as any)[key as keyof typeof formData];
+      }
+    });
+
+    const success = await updateStore(currentStore.id, payload);
     if (success) {
       toast({
         title: 'Sukses',
