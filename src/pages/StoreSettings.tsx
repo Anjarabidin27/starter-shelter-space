@@ -168,9 +168,10 @@ export const StoreSettings = () => {
       localStorage.setItem(`qrisUrl:${currentStore.id}`, publicUrl);
 
       toast({ title: 'Sukses', description: 'QRIS berhasil diupload dan disimpan ke database' });
-    } catch (err) {
+    } catch (err: any) {
       console.error('QRIS upload error:', err);
-      toast({ title: 'Error', description: 'Gagal memproses/mengupload QRIS', variant: 'destructive' });
+      const message = err?.message || (typeof err === 'string' ? err : 'Gagal memproses/mengupload QRIS');
+      toast({ title: 'Error', description: message, variant: 'destructive' });
     } finally {
       setUploadingQris(false);
     }
