@@ -40,8 +40,13 @@ export const QuickProductSearch = ({ products, onAddToCart, formatPrice }: Quick
     .slice(0, 5); // Limit to 5 results
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isOpen) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100);
     }
   }, [isOpen]);
 

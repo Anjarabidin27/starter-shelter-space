@@ -63,8 +63,10 @@ export const QuickInvoice = ({
   });
 
   useEffect(() => {
-    // Auto-focus search input
-    searchInputRef.current?.focus();
+    // Auto-focus search input with safety check
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
   }, []);
 
   const handleProductSelect = (product: Product) => {
