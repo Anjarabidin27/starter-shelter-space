@@ -1,11 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Receipt as ReceiptIcon, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Receipt as ReceiptIcon, Search, Scan } from 'lucide-react';
 import { Product } from '@/types/pos';
 import { useState, useRef, useEffect } from 'react';
 import { ShoppingCart } from './ShoppingCart';
 import { CartItem, Receipt } from '@/types/pos';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Capacitor } from '@capacitor/core';
+import { toast } from 'sonner';
 
 interface QuickInvoiceProps {
   onCreateInvoice: (receipt: Receipt) => void;
@@ -36,6 +40,7 @@ export const QuickInvoice = ({
   onViewReceipt
 }: QuickInvoiceProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isScanning, setIsScanning] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter products based on search
@@ -57,16 +62,81 @@ export const QuickInvoice = ({
     searchInputRef.current?.focus();
   };
 
+  const handleBarcodeScanner = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      toast.error('Scan barcode hanya tersedia di aplikasi mobile');
+      return;
+    }
+
+    try {
+      setIsScanning(true);
+      
+      // Check permission
+      const status = await BarcodeScanner.checkPermission({ force: true });
+      
+      if (!status.granted) {
+        toast.error('Izin kamera tidak diberikan');
+        setIsScanning(false);
+        return;
+      }
+
+      // Make background transparent
+      document.body.classList.add('scanner-active');
+      
+      // Start scanning
+      const result = await BarcodeScanner.startScan();
+      
+      // Remove transparency
+      document.body.classList.remove('scanner-active');
+      setIsScanning(false);
+
+      if (result.hasContent) {
+        // Search for product by barcode or code
+        const foundProduct = products.find(p => 
+          p.barcode?.toLowerCase() === result.content?.toLowerCase() ||
+          p.code?.toLowerCase() === result.content?.toLowerCase() ||
+          p.name.toLowerCase().includes(result.content?.toLowerCase() || '')
+        );
+
+        if (foundProduct) {
+          addToCart(foundProduct, 1);
+          toast.success(`Produk "${foundProduct.name}" ditambahkan ke keranjang`);
+        } else {
+          toast.error(`Produk dengan kode "${result.content}" tidak ditemukan`);
+        }
+      }
+    } catch (error) {
+      console.error('Barcode scan error:', error);
+      document.body.classList.remove('scanner-active');
+      setIsScanning(false);
+      toast.error('Terjadi kesalahan saat scanning');
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Product Search - Simplified for quick entry */}
       <div className="lg:col-span-2">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <ReceiptIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              Nota Cepat - Cari Produk
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <ReceiptIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+                Nota Cepat - Cari Produk
+              </CardTitle>
+              {Capacitor.isNativePlatform() && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBarcodeScanner}
+                  disabled={isScanning}
+                  className="h-8"
+                >
+                  <Scan className="h-4 w-4 mr-2" />
+                  {isScanning ? 'Scanning...' : 'Scan'}
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">

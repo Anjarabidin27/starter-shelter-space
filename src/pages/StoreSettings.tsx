@@ -112,8 +112,8 @@ export const StoreSettings = () => {
           onClose={() => navigate('/')}
           onSuccess={() => setShowAdminProtection(false)}
           title="Masuk ke Pengaturan Toko"
-          description="Masukkan kode pengaturan untuk mengakses menu ini"
-          useSettingsPassword={true}
+          description="Masukkan kata sandi admin untuk mengakses menu ini"
+          useSettingsPassword={false}
         />
       </div>
     );
