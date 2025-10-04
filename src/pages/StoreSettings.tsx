@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { StoreCategory, STORE_CATEGORIES } from '@/types/store';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Store as StoreIcon } from 'lucide-react';
+import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AdminProtection } from '@/components/Auth/AdminProtection';
 
@@ -47,6 +47,8 @@ export const StoreSettings = () => {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
+  const [showSettingsPassword, setShowSettingsPassword] = useState(false);
 
   useEffect(() => {
     if (currentStore) {
@@ -374,14 +376,25 @@ export const StoreSettings = () => {
 
                 <div>
                   <Label htmlFor="admin_password" className="text-xs sm:text-sm">Kata Sandi Admin (Menu Admin)</Label>
-                  <Input
-                    id="admin_password"
-                    type="password"
-                    value={formData.admin_password}
-                    onChange={(e) => handleInputChange('admin_password', e.target.value)}
-                    placeholder="Default: 122344566"
-                    className="h-9 sm:h-10 text-sm"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="admin_password"
+                      type={showAdminPassword ? "text" : "password"}
+                      value={formData.admin_password}
+                      onChange={(e) => handleInputChange('admin_password', e.target.value)}
+                      placeholder="Default: 122344566"
+                      className="h-9 sm:h-10 text-sm pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-9 sm:h-10 px-3 hover:bg-transparent"
+                      onClick={() => setShowAdminPassword(!showAdminPassword)}
+                    >
+                      {showAdminPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     Kode untuk mengakses menu admin
                   </p>
@@ -389,14 +402,25 @@ export const StoreSettings = () => {
 
                 <div>
                   <Label htmlFor="settings_password" className="text-xs sm:text-sm">Kata Sandi Pengaturan (Menu Pengaturan)</Label>
-                  <Input
-                    id="settings_password"
-                    type="password"
-                    value={formData.settings_password}
-                    onChange={(e) => handleInputChange('settings_password', e.target.value)}
-                    placeholder="Default: 12234566"
-                    className="h-9 sm:h-10 text-sm"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="settings_password"
+                      type={showSettingsPassword ? "text" : "password"}
+                      value={formData.settings_password}
+                      onChange={(e) => handleInputChange('settings_password', e.target.value)}
+                      placeholder="Default: 12234566"
+                      className="h-9 sm:h-10 text-sm pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-9 sm:h-10 px-3 hover:bg-transparent"
+                      onClick={() => setShowSettingsPassword(!showSettingsPassword)}
+                    >
+                      {showSettingsPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     Kode untuk mengakses menu pengaturan toko
                   </p>

@@ -248,33 +248,36 @@ export const StockManagement = ({
               {!isService(product) && !readOnly && (
                    <div className="mt-3 p-3 bg-muted/50 rounded border">
                      <div className="text-xs font-medium mb-2">Tambah Stok:</div>
-                    <QuantitySelector
-                      quantity={bulkStockInputs[product.id] || 0}
-                      productName={product.name}
-                      category={product.category}
-                      onQuantityChange={(qty) => {
-                        console.log('StockManagement - Quantity changed for', product.name, ':', qty);
-                        setBulkStockInputs(prev => ({
-                          ...prev,
-                          [product.id]: qty
-                        }));
-                      }}
-                      showUnitSelector={true}
-                    />
-                   <Button
-                     size="sm"
-                     onClick={(e) => {
-                       e.preventDefault();
-                       e.stopPropagation();
-                       handleBulkStockAdd(product.id);
-                     }}
-                     className="h-8 px-3 mt-2 w-full"
-                     disabled={!bulkStockInputs[product.id] || bulkStockInputs[product.id] <= 0}
-                   >
-                     <Plus className="h-3 w-3 mr-1" />
-                     Tambah
-                   </Button>
-                 </div>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        min="0"
+                        value={bulkStockInputs[product.id] || 0}
+                        onChange={(e) => {
+                          const qty = parseInt(e.target.value) || 0;
+                          setBulkStockInputs(prev => ({
+                            ...prev,
+                            [product.id]: qty
+                          }));
+                        }}
+                        className="h-8"
+                        placeholder="0"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleBulkStockAdd(product.id);
+                        }}
+                        className="h-8 px-3"
+                        disabled={!bulkStockInputs[product.id] || bulkStockInputs[product.id] <= 0}
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Tambah
+                      </Button>
+                    </div>
+                  </div>
               )}
 
               {product.stock <= 24 && !isService(product) && (

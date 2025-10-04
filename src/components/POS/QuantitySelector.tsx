@@ -188,6 +188,24 @@ export const QuantitySelector = ({
                 ))}
               </SelectContent>
             </Select>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 w-8 p-0 shrink-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                if (unitQuantity > 0) {
+                  const multiplier = getUnitMultiplier(selectedUnit, category);
+                  const additionalQuantity = unitQuantity * multiplier;
+                  handleQuantityChange(quantity + additionalQuantity);
+                  setUnitQuantity(0);
+                }
+              }}
+              disabled={!unitQuantity || unitQuantity <= 0}
+            >
+              <Plus className="h-3 w-3" />
+            </Button>
           </div>
         </div>
       )}

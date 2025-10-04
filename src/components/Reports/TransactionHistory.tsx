@@ -125,61 +125,63 @@ export const TransactionHistory = ({
         </Card>
       </div>
 
-      {/* Filters */}
-      <Card>
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center">
+        <div className="flex-1 w-full">
+          <Input
+            placeholder="Cari transaksi (invoice, produk, metode pembayaran)..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-10"
+          />
+        </div>
+        <Select value={selectedDate} onValueChange={setSelectedDate}>
+          <SelectTrigger className="w-full sm:w-48">
+            <SelectValue placeholder="Pilih periode" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua Waktu</SelectItem>
+            <SelectItem value="today">Hari Ini</SelectItem>
+            <SelectItem value="yesterday">Kemarin</SelectItem>
+            <SelectItem value="custom">Periode Kustom</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {selectedDate === 'custom' && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="startDate">Dari Tanggal</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="endDate">Sampai Tanggal</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Filters - Removed old filter card */}
+      <Card className="hidden">
         <CardHeader>
           <CardTitle>Filter Transaksi</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="search">Cari Transaksi</Label>
-              <Input
-                id="search"
-                placeholder="Cari berdasarkan invoice, produk, atau metode pembayaran..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="period">Periode</Label>
-              <Select value={selectedDate} onValueChange={setSelectedDate}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih periode" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Waktu</SelectItem>
-                  <SelectItem value="today">Hari Ini</SelectItem>
-                  <SelectItem value="yesterday">Kemarin</SelectItem>
-                  <SelectItem value="custom">Periode Kustom</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {selectedDate === 'custom' && (
-              <>
-                <div>
-                  <Label htmlFor="startDate">Dari Tanggal</Label>
-                  <Input
-                    id="startDate"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="endDate">Sampai Tanggal</Label>
-                  <Input
-                    id="endDate"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                  />
-                </div>
-              </>
-            )}
-          </div>
+          {/* This card is now hidden - filters moved to top */}
         </CardContent>
       </Card>
 

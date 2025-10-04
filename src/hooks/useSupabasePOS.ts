@@ -145,7 +145,6 @@ export const useSupabasePOS = () => {
         .from('products')
         .insert({
           name: productData.name,
-          price: productData.sellPrice,
           cost_price: productData.costPrice,
           sell_price: productData.sellPrice,
           stock: productData.stock,
@@ -168,10 +167,7 @@ export const useSupabasePOS = () => {
       const updateData: any = {};
       if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.costPrice !== undefined) updateData.cost_price = updates.costPrice;
-      if (updates.sellPrice !== undefined) {
-        updateData.sell_price = updates.sellPrice;
-        updateData.price = updates.sellPrice; // Keep price in sync
-      }
+      if (updates.sellPrice !== undefined) updateData.sell_price = updates.sellPrice;
       if (updates.stock !== undefined) updateData.stock = updates.stock;
       if (updates.barcode !== undefined) updateData.barcode = updates.barcode;
       if (updates.category !== undefined) updateData.category = updates.category;
@@ -297,9 +293,7 @@ export const useSupabasePOS = () => {
         isManual: false
       };
 
-      // Immediately update local state for instant UI update
-      setReceipts(prev => [receipt, ...prev]);
-
+      // Don't update local state here - let real-time subscription handle it
       toast.success('Transaksi berhasil disimpan');
       return receipt;
     } catch (error) {
@@ -428,8 +422,7 @@ export const useSupabasePOS = () => {
         isManual: true
       };
       
-      setReceipts(prev => [newReceipt, ...prev]);
-      
+      // Don't update local state here - let real-time subscription handle it
       toast.success(`Nota manual ${invoiceNumber} berhasil disimpan ke database`);
     } catch (error) {
       console.error('Error saving manual receipt:', error);
