@@ -131,7 +131,14 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
             <div>
               <CardTitle>Struk {receipt.id}</CardTitle>
               <p className="text-sm text-muted-foreground">
-                {receipt.timestamp.toLocaleString('id-ID')}
+                {new Intl.DateTimeFormat('id-ID', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false
+                }).format(receipt.timestamp)}
               </p>
             </div>
             <Badge variant={receipt.paymentMethod === 'tunai' ? 'default' : 'secondary'}>
