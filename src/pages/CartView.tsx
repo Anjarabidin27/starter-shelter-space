@@ -56,6 +56,11 @@ export const CartView = () => {
     const receipt = await processTransaction('cash', 0);
     if (receipt) {
       try {
+        // Auto-connect and print without clicking twice
+        if (!thermalPrinter.isConnected()) {
+          await thermalPrinter.connect();
+        }
+        
         const thermalContent = formatThermalReceipt(receipt, formatPrice);
         const success = await thermalPrinter.print(thermalContent);
         

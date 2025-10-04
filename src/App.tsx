@@ -15,7 +15,6 @@ import { BluetoothProvider } from "@/contexts/BluetoothContext";
 import { LoginPage } from "@/components/Auth/LoginPage";
 import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { useState } from "react";
 
 // Create QueryClient outside component to prevent recreation on every render
 const queryClient = new QueryClient({

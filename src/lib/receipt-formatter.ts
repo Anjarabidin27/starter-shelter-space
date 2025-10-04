@@ -13,6 +13,7 @@ export const formatThermalReceipt = (
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false
     }).format(date);
   };
 
@@ -100,6 +101,7 @@ export const formatMobileA4ThermalReceipt = (
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false
     }).format(date);
   };
 
@@ -192,6 +194,7 @@ export const formatPrintReceipt = (
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false
     }).format(date);
   };
 
@@ -312,6 +315,7 @@ export const formatMobileA4PrintReceipt = (
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      hour12: false
     }).format(date);
   };
 
