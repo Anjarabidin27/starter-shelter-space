@@ -20,7 +20,7 @@ export const AdminProtection = ({
   isOpen, 
   onClose, 
   onSuccess, 
-  title = "Admin Authentication Required",
+  title = "Autentikasi Admin Diperlukan",
   description = "Masukkan kata sandi admin untuk melanjutkan",
   useSettingsPassword = false
 }: AdminProtectionProps) => {
@@ -30,7 +30,7 @@ export const AdminProtection = ({
   const { currentStore } = useStore();
 
   // Use settings password or admin password based on prop
-  const ADMIN_PASSWORD = useSettingsPassword 
+  const REQUIRED_PASSWORD = useSettingsPassword 
     ? ((currentStore as any)?.settings_password || '12234566')
     : ((currentStore as any)?.admin_password || '122344566');
 
@@ -42,14 +42,18 @@ export const AdminProtection = ({
     // Simulate a brief delay for security
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    if (password === ADMIN_PASSWORD) {
-      toast.success('Akses admin berhasil!');
+    console.log('Password check:', { entered: password, required: REQUIRED_PASSWORD, useSettings: useSettingsPassword });
+
+    if (password === REQUIRED_PASSWORD) {
+      const successMsg = useSettingsPassword ? 'Akses pengaturan berhasil!' : 'Akses admin berhasil!';
+      toast.success(successMsg);
       setPassword('');
       setIsLoading(false);
       onSuccess();
       handleClose(); // Auto close after success
     } else {
-      setError('Kata sandi admin salah!');
+      const errorMsg = useSettingsPassword ? 'Kode pengaturan salah!' : 'Kata sandi admin salah!';
+      setError(errorMsg);
       setIsLoading(false);
     }
   };
@@ -70,13 +74,15 @@ export const AdminProtection = ({
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="adminPassword">Kata Sandi Admin</Label>
+            <Label htmlFor="adminPassword">
+              {useSettingsPassword ? 'Kode Pengaturan' : 'Kata Sandi Admin'}
+            </Label>
             <Input
               id="adminPassword"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Masukkan kata sandi admin"
+              placeholder={useSettingsPassword ? 'Masukkan kode pengaturan' : 'Masukkan kata sandi admin'}
               required
               autoFocus
             />
