@@ -37,10 +37,6 @@ interface ReceiptProps {
   formatPrice: (price: number) => string;
   onBack?: () => void;
 }
-  receipt: ReceiptType;
-  formatPrice: (price: number) => string;
-  onBack?: () => void;
-}
 
 export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
   const { currentStore } = useStore();
