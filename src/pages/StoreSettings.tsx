@@ -183,11 +183,34 @@ export const StoreSettings = () => {
       });
     } catch (error) {
       console.error('Error uploading QRIS:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal mengupload gambar QRIS',
-        variant: 'destructive',
-      });
+      // Fallback: simpan sebagai Data URL (base64) di qris_image_url
+      try {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          if (result) {
+            handleInputChange('qris_image_url', result);
+            toast({
+              title: 'Berhasil (Mode Cadangan)',
+              description: 'QRIS disimpan tanpa cloud storage. Disarankan mengaktifkan penyimpanan agar lebih ringan.',
+            });
+          }
+        };
+        reader.onerror = () => {
+          toast({
+            title: 'Error',
+            description: 'Gagal membaca file QRIS',
+            variant: 'destructive',
+          });
+        };
+        reader.readAsDataURL(file);
+      } catch (e) {
+        toast({
+          title: 'Error',
+          description: 'Gagal mengupload gambar QRIS',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setUploadingQris(false);
     }
