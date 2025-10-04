@@ -260,16 +260,6 @@ export const StockManagement = ({
                         }));
                       }}
                       showUnitSelector={true}
-                      onGetTotalQuantity={(getTotalQty) => {
-                        // Store the function to get total quantity
-                        const totalQty = getTotalQty();
-                        if (totalQty > 0) {
-                          setBulkStockInputs(prev => ({
-                            ...prev,
-                            [product.id]: totalQty
-                          }));
-                        }
-                      }}
                     />
                    <Button
                      size="sm"

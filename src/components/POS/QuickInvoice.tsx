@@ -124,18 +124,16 @@ export const QuickInvoice = ({
                 <ReceiptIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 Nota Cepat - Cari Produk
               </CardTitle>
-              {Capacitor.isNativePlatform() && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleBarcodeScanner}
-                  disabled={isScanning}
-                  className="h-8"
-                >
-                  <Scan className="h-4 w-4 mr-2" />
-                  {isScanning ? 'Scanning...' : 'Scan'}
-                </Button>
-              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBarcodeScanner}
+                disabled={isScanning}
+                className="h-8"
+              >
+                <Scan className="h-4 w-4 mr-2" />
+                {isScanning ? 'Scanning...' : 'Scan'}
+              </Button>
             </div>
           </CardHeader>
           <CardContent>

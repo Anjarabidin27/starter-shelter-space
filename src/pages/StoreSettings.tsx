@@ -109,7 +109,10 @@ export const StoreSettings = () => {
       <div className="min-h-screen w-full bg-background flex items-center justify-center p-4">
         <AdminProtection
           isOpen={showAdminProtection}
-          onClose={() => navigate('/')}
+          onClose={() => {
+            setShowAdminProtection(false);
+            navigate('/');
+          }}
           onSuccess={() => setShowAdminProtection(false)}
           title="Masuk ke Pengaturan Toko"
           description="Masukkan kode pengaturan untuk mengakses menu ini"
