@@ -128,18 +128,31 @@ export const useSupabasePOS = () => {
   };
 
   const addProduct = async (productData: Omit<Product, 'id'>) => {
+    if (!user) {
+      toast.error('Harap login terlebih dahulu');
+      return;
+    }
+
     try {
+      const { data: stores } = await supabase
+        .from('stores')
+        .select('id')
+        .eq('owner_id', user.id)
+        .limit(1)
+        .single();
+
       const { error } = await supabase
         .from('products')
         .insert({
           name: productData.name,
-          price: productData.sellPrice, // Keep price for compatibility
+          price: productData.sellPrice,
           cost_price: productData.costPrice,
           sell_price: productData.sellPrice,
           stock: productData.stock,
           barcode: productData.barcode,
           category: productData.category || 'General',
-          is_photocopy: productData.isPhotocopy || false
+          is_photocopy: productData.isPhotocopy || false,
+          store_id: stores?.id || null
         });
 
       if (error) throw error;

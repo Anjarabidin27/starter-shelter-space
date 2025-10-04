@@ -126,9 +126,10 @@ export const QuantitySelector = ({
         
         <Input
           type="number"
-          value={quantity || ''}
+          value={quantity === 0 ? '' : quantity}
           onChange={handleQuantityInputChange}
           onKeyDown={handleKeyDown}
+          onFocus={(e) => e.target.select()}
           className="h-8 w-20 text-center text-sm"
           min="0"
           max={maxStock}

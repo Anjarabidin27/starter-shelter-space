@@ -248,7 +248,7 @@ export const POSInterface = () => {
 ${storeAddress ? storeAddress + '\n' : ''}${storePhone ? 'Telp: ' + storePhone + '\n' : ''}
 Invoice: ${receipt.id}
 Tanggal: ${new Date(receipt.timestamp).toLocaleDateString('id-ID')}
-Waktu: ${new Date(receipt.timestamp).toLocaleTimeString('id-ID')}
+Waktu: ${new Date(receipt.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
 -------------------------------
 
 ${receipt.items.map(item => `
@@ -767,6 +767,13 @@ Profit: ${formatPrice(receipt.profit)}
                 receipts={receipts}
                 onPrintReceipt={handlePrintThermal}
                 products={products}
+                cart={cart}
+                updateCartQuantity={updateCartQuantity}
+                removeFromCart={removeFromCart}
+                clearCart={clearCart}
+                processTransaction={handleProcessTransaction}
+                addToCart={addToCart}
+                onViewReceipt={handleViewReceipt}
               />
             </Suspense>
           </TabsContent>

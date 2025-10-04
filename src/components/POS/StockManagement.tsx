@@ -246,8 +246,8 @@ export const StockManagement = ({
               )}
 
               {!isService(product) && !readOnly && (
-                 <div className="mt-3 p-3 bg-muted/50 rounded border">
-                   <div className="text-xs font-medium mb-2">Tambah Stok:</div>
+                   <div className="mt-3 p-3 bg-muted/50 rounded border">
+                     <div className="text-xs font-medium mb-2">Tambah Stok:</div>
                     <QuantitySelector
                       quantity={bulkStockInputs[product.id] || 0}
                       productName={product.name}
@@ -260,11 +260,25 @@ export const StockManagement = ({
                         }));
                       }}
                       showUnitSelector={true}
+                      onGetTotalQuantity={(getTotalQty) => {
+                        // Store the function to get total quantity
+                        const totalQty = getTotalQty();
+                        if (totalQty > 0) {
+                          setBulkStockInputs(prev => ({
+                            ...prev,
+                            [product.id]: totalQty
+                          }));
+                        }
+                      }}
                     />
                    <Button
                      size="sm"
-                     onClick={() => handleBulkStockAdd(product.id)}
-                     className="h-8 px-3 mt-2"
+                     onClick={(e) => {
+                       e.preventDefault();
+                       e.stopPropagation();
+                       handleBulkStockAdd(product.id);
+                     }}
+                     className="h-8 px-3 mt-2 w-full"
                      disabled={!bulkStockInputs[product.id] || bulkStockInputs[product.id] <= 0}
                    >
                      <Plus className="h-3 w-3 mr-1" />

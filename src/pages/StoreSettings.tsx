@@ -41,6 +41,9 @@ export const StoreSettings = () => {
     ovo_number: '',
     dana_number: '',
     shopeepay_number: '',
+    whatsapp_number: '',
+    admin_password: '',
+    settings_password: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
@@ -63,6 +66,9 @@ export const StoreSettings = () => {
         ovo_number: (currentStore as any).ovo_number || '',
         dana_number: (currentStore as any).dana_number || '',
         shopeepay_number: (currentStore as any).shopeepay_number || '',
+        whatsapp_number: (currentStore as any).whatsapp_number || '',
+        admin_password: (currentStore as any).admin_password || '122344566',
+        settings_password: (currentStore as any).settings_password || '12234566',
       });
     }
   }, [currentStore]);
@@ -106,7 +112,8 @@ export const StoreSettings = () => {
           onClose={() => navigate('/')}
           onSuccess={() => setShowAdminProtection(false)}
           title="Masuk ke Pengaturan Toko"
-          description="Masukkan kode admin untuk mengakses pengaturan toko"
+          description="Masukkan kode pengaturan untuk mengakses menu ini"
+          useSettingsPassword={true}
         />
       </div>
     );
@@ -217,25 +224,27 @@ export const StoreSettings = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <Label htmlFor="opening_hours" className="text-xs sm:text-sm">Jam Buka</Label>
+                    <Label htmlFor="opening_hours" className="text-xs sm:text-sm">Jam Buka (HH:MM)</Label>
                     <Input
                       id="opening_hours"
                       type="time"
                       value={formData.opening_hours}
                       onChange={(e) => handleInputChange('opening_hours', e.target.value)}
                       placeholder="08:00"
-                      className="h-9 sm:h-10 text-sm"
+                      className="h-9 sm:h-10 text-sm [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-second-field]:hidden [&::-webkit-datetime-edit-ampm-field]:hidden"
+                      step="60"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="closing_hours" className="text-xs sm:text-sm">Jam Tutup</Label>
+                    <Label htmlFor="closing_hours" className="text-xs sm:text-sm">Jam Tutup (HH:MM)</Label>
                     <Input
                       id="closing_hours"
                       type="time"
                       value={formData.closing_hours}
                       onChange={(e) => handleInputChange('closing_hours', e.target.value)}
                       placeholder="21:00"
-                      className="h-9 sm:h-10 text-sm"
+                      className="h-9 sm:h-10 text-sm [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-datetime-edit-second-field]:hidden [&::-webkit-datetime-edit-ampm-field]:hidden"
+                      step="60"
                     />
                   </div>
                 </div>
@@ -334,6 +343,60 @@ export const StoreSettings = () => {
                       />
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardHeader className="pb-3 sm:pb-6">
+                <CardTitle className="text-base sm:text-lg">Konfigurasi WhatsApp & Keamanan</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Nomor WhatsApp untuk daftar belanja & kata sandi admin
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 sm:space-y-4">
+                <div>
+                  <Label htmlFor="whatsapp_number" className="text-xs sm:text-sm">Nomor WhatsApp (untuk Daftar Belanja)</Label>
+                  <Input
+                    id="whatsapp_number"
+                    value={formData.whatsapp_number}
+                    onChange={(e) => handleInputChange('whatsapp_number', e.target.value)}
+                    placeholder="08xx xxxx xxxx"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Nomor WhatsApp untuk mengirim daftar belanja
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="admin_password" className="text-xs sm:text-sm">Kata Sandi Admin (Menu Admin)</Label>
+                  <Input
+                    id="admin_password"
+                    type="password"
+                    value={formData.admin_password}
+                    onChange={(e) => handleInputChange('admin_password', e.target.value)}
+                    placeholder="Default: 122344566"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Kode untuk mengakses menu admin
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="settings_password" className="text-xs sm:text-sm">Kata Sandi Pengaturan (Menu Pengaturan)</Label>
+                  <Input
+                    id="settings_password"
+                    type="password"
+                    value={formData.settings_password}
+                    onChange={(e) => handleInputChange('settings_password', e.target.value)}
+                    placeholder="Default: 12234566"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Kode untuk mengakses menu pengaturan toko
+                  </p>
                 </div>
               </CardContent>
             </Card>

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
+import { useStore } from '@/contexts/StoreContext';
 
 interface AdminProtectionProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface AdminProtectionProps {
   onSuccess: () => void;
   title?: string;
   description?: string;
+  useSettingsPassword?: boolean; // Add flag to use settings password instead
 }
 
 export const AdminProtection = ({ 
@@ -19,13 +21,18 @@ export const AdminProtection = ({
   onClose, 
   onSuccess, 
   title = "Admin Authentication Required",
-  description = "Masukkan kata sandi admin untuk melanjutkan"
+  description = "Masukkan kata sandi admin untuk melanjutkan",
+  useSettingsPassword = false
 }: AdminProtectionProps) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { currentStore } = useStore();
 
-  const ADMIN_PASSWORD = '122344566';
+  // Use settings password or admin password based on prop
+  const ADMIN_PASSWORD = useSettingsPassword 
+    ? ((currentStore as any)?.settings_password || '12234566')
+    : ((currentStore as any)?.admin_password || '122344566');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +45,13 @@ export const AdminProtection = ({
     if (password === ADMIN_PASSWORD) {
       toast.success('Akses admin berhasil!');
       setPassword('');
+      setIsLoading(false);
       onSuccess();
+      handleClose(); // Auto close after success
     } else {
       setError('Kata sandi admin salah!');
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleClose = () => {

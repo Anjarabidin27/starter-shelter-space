@@ -30,7 +30,7 @@ export const formatReceiptId = (receipt: Receipt): string => {
 export const formatReceiptDetailedInfo = (receipt: Receipt): string => {
   const formattedId = formatReceiptId(receipt);
   const date = receipt.timestamp.toLocaleDateString('id-ID');
-  const time = receipt.timestamp.toLocaleTimeString('id-ID');
+  const time = receipt.timestamp.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   
   return `${formattedId} - ${date} ${time}`;
 };

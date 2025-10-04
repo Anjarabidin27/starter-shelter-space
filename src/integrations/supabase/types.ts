@@ -251,6 +251,7 @@ export type Database = {
       stores: {
         Row: {
           address: string | null
+          admin_password: string | null
           bank_account_holder: string | null
           bank_account_number: string | null
           bank_name: string | null
@@ -267,11 +268,14 @@ export type Database = {
           ovo_number: string | null
           owner_id: string
           phone: string | null
+          settings_password: string | null
           shopeepay_number: string | null
           updated_at: string
+          whatsapp_number: string | null
         }
         Insert: {
           address?: string | null
+          admin_password?: string | null
           bank_account_holder?: string | null
           bank_account_number?: string | null
           bank_name?: string | null
@@ -288,11 +292,14 @@ export type Database = {
           ovo_number?: string | null
           owner_id: string
           phone?: string | null
+          settings_password?: string | null
           shopeepay_number?: string | null
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Update: {
           address?: string | null
+          admin_password?: string | null
           bank_account_holder?: string | null
           bank_account_number?: string | null
           bank_name?: string | null
@@ -309,8 +316,10 @@ export type Database = {
           ovo_number?: string | null
           owner_id?: string
           phone?: string | null
+          settings_password?: string | null
           shopeepay_number?: string | null
           updated_at?: string
+          whatsapp_number?: string | null
         }
         Relationships: []
       }

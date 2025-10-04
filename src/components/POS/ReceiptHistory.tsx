@@ -235,7 +235,7 @@ export const ReceiptHistory = ({
                     <div>
                       <span className="block">Waktu:</span>
                       <span className="font-medium text-foreground">
-                        {new Date(receipt.timestamp).toLocaleTimeString('id-ID')}
+                        {new Date(receipt.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
                   </div>

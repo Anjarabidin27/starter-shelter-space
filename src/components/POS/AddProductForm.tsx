@@ -309,38 +309,6 @@ export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], o
                   />
                 </div>
                 
-                <div>
-                  <Label htmlFor="category">Kategori</Label>
-                  <Select 
-                    value={formData.category} 
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih kategori" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {isAtkStore ? (
-                        <>
-                          <SelectItem value="Fotocopy">Fotocopy</SelectItem>
-                          <SelectItem value="Alat Tulis">Alat Tulis</SelectItem>
-                          <SelectItem value="ATK">ATK</SelectItem>
-                          <SelectItem value="Kertas">Kertas</SelectItem>
-                          <SelectItem value="Pramuka">Pramuka</SelectItem>
-                          <SelectItem value="Lainnya">Lainnya</SelectItem>
-                        </>
-                      ) : (
-                        <>
-                          <SelectItem value="Makanan">Makanan</SelectItem>
-                          <SelectItem value="Minuman">Minuman</SelectItem>
-                          <SelectItem value="Snack">Snack</SelectItem>
-                          <SelectItem value="Sembako">Sembako</SelectItem>
-                          <SelectItem value="Kebutuhan Rumah">Kebutuhan Rumah</SelectItem>
-                          <SelectItem value="Lainnya">Lainnya</SelectItem>
-                        </>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
 
                 <div>
                   <Label htmlFor="code">Kode Produk (opsional)</Label>

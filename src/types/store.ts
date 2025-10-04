@@ -25,6 +25,9 @@ export interface Store {
   ovo_number?: string;
   dana_number?: string;
   shopeepay_number?: string;
+  whatsapp_number?: string;
+  admin_password?: string;
+  settings_password?: string;
   owner_id: string;
   created_at: string;
   updated_at: string;
