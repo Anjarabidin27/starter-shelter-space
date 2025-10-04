@@ -41,8 +41,8 @@ export const formatThermalReceipt = (
 ${store.bank_name}
 No. Rek: ${store.bank_account_number || ''}
 a.n. ${store.bank_account_holder || ''}`
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
-    ? `\nQRIS: ${store.ewallet_number}`
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
+    ? `\nQRIS: Lihat gambar QRIS di struk`
     : '';
 
   return `${ESC}@${CENTER}${BOLD_ON}================================${BOLD_OFF}
@@ -130,8 +130,8 @@ export const formatMobileA4ThermalReceipt = (
     ? `\n\nTransfer ke: ${store.bank_name}
 No. Rekening: ${store.bank_account_number || ''}
 Atas Nama: ${store.bank_account_holder || ''}`
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
-    ? `\nQRIS E-Wallet: ${store.ewallet_number}`
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
+    ? `\nQRIS: Lihat gambar QRIS di struk`
     : '';
 
   return `${ESC}@${CENTER}${BOLD_ON}${DOUBLE_HEIGHT}================================================${BOLD_OFF}${NORMAL_SIZE}
@@ -213,11 +213,11 @@ export const formatPrintReceipt = (
           </div>
         </div>
       `
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
     ? `
         <div style="border-top: 1px solid #e5e7eb; margin: 16px 0; padding-top: 16px;">
           <div style="font-size: 14px; color: #666; text-align: center;">
-            QRIS E-Wallet: <strong>${store.ewallet_number}</strong>
+            QRIS: <strong>Lihat gambar QRIS di struk</strong>
           </div>
         </div>
       `
@@ -335,11 +335,11 @@ export const formatMobileA4PrintReceipt = (
           </div>
         </div>
       `
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.ewallet_number
+    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
     ? `
         <div style="border-top: 2px solid #000; margin: 30px 0; padding-top: 20px; text-align: center;">
           <div style="font-size: 16px;">
-            QRIS E-Wallet: <strong>${store.ewallet_number}</strong>
+            QRIS: <strong>Lihat gambar QRIS di struk</strong>
           </div>
         </div>
       `

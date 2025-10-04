@@ -15,9 +15,10 @@ import {
 } from '@/components/ui/select';
 import { StoreCategory, STORE_CATEGORIES } from '@/types/store';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff, Upload, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AdminProtection } from '@/components/Auth/AdminProtection';
+import { supabase } from '@/integrations/supabase/client';
 
 export const StoreSettings = () => {
   const { currentStore, updateStore } = useStore();
@@ -36,11 +37,7 @@ export const StoreSettings = () => {
     bank_name: '',
     bank_account_number: '',
     bank_account_holder: '',
-    ewallet_number: '',
-    gopay_number: '',
-    ovo_number: '',
-    dana_number: '',
-    shopeepay_number: '',
+    qris_image_url: '',
     whatsapp_number: '',
     admin_password: '',
     settings_password: '',
@@ -49,6 +46,7 @@ export const StoreSettings = () => {
   const [showAdminProtection, setShowAdminProtection] = useState(true);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showSettingsPassword, setShowSettingsPassword] = useState(false);
+  const [uploadingQris, setUploadingQris] = useState(false);
 
   useEffect(() => {
     if (currentStore) {
@@ -63,11 +61,7 @@ export const StoreSettings = () => {
         bank_name: (currentStore as any).bank_name || '',
         bank_account_number: (currentStore as any).bank_account_number || '',
         bank_account_holder: (currentStore as any).bank_account_holder || '',
-        ewallet_number: (currentStore as any).ewallet_number || '',
-        gopay_number: (currentStore as any).gopay_number || '',
-        ovo_number: (currentStore as any).ovo_number || '',
-        dana_number: (currentStore as any).dana_number || '',
-        shopeepay_number: (currentStore as any).shopeepay_number || '',
+        qris_image_url: (currentStore as any).qris_image_url || '',
         whatsapp_number: (currentStore as any).whatsapp_number || '',
         admin_password: (currentStore as any).admin_password || '122344566',
         settings_password: (currentStore as any).settings_password || '12234566',
@@ -91,6 +85,72 @@ export const StoreSettings = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleQrisUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentStore || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Error',
+        description: 'File harus berupa gambar',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: 'Error',
+        description: 'Ukuran file maksimal 2MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setUploadingQris(true);
+
+    try {
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${currentStore.id}-qris-${Date.now()}.${fileExt}`;
+      const filePath = `qris/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('store-assets')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('store-assets')
+        .getPublicUrl(filePath);
+
+      // Update form data
+      handleInputChange('qris_image_url', publicUrl);
+
+      toast({
+        title: 'Sukses',
+        description: 'Gambar QRIS berhasil diupload',
+      });
+    } catch (error) {
+      console.error('Error uploading QRIS:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal mengupload gambar QRIS',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingQris(false);
+    }
+  };
+
+  const handleRemoveQris = () => {
+    handleInputChange('qris_image_url', '');
   };
 
   if (!currentStore) {
@@ -298,56 +358,53 @@ export const StoreSettings = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="text-sm font-medium">Nomor E-Wallet</div>
+                  <div className="text-sm font-medium">Gambar QRIS</div>
                   <p className="text-xs text-muted-foreground">
-                    Isi nomor telepon e-wallet yang terdaftar. QR code akan otomatis dibuat untuk pembayaran.
+                    Upload gambar QRIS asli Anda untuk pembayaran. Gambar akan ditampilkan pada nota dan checkout.
                   </p>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {formData.qris_image_url ? (
+                    <div className="space-y-2">
+                      <div className="relative inline-block">
+                        <img 
+                          src={formData.qris_image_url} 
+                          alt="QRIS" 
+                          className="w-48 h-48 object-contain border rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                          onClick={handleRemoveQris}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
                     <div>
-                      <Label htmlFor="gopay_number" className="text-xs sm:text-sm">GoPay</Label>
+                      <Label htmlFor="qris_upload" className="cursor-pointer">
+                        <div className="border-2 border-dashed border-border rounded-lg p-6 hover:border-primary transition-colors text-center">
+                          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">
+                            {uploadingQris ? 'Mengupload...' : 'Klik untuk upload gambar QRIS'}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            PNG, JPG, maksimal 2MB
+                          </p>
+                        </div>
+                      </Label>
                       <Input
-                        id="gopay_number"
-                        value={formData.gopay_number}
-                        onChange={(e) => handleInputChange('gopay_number', e.target.value)}
-                        placeholder="08xx xxxx xxxx"
-                        className="h-9 sm:h-10 text-sm"
+                        id="qris_upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleQrisUpload}
+                        className="hidden"
+                        disabled={uploadingQris}
                       />
                     </div>
-                    
-                    <div>
-                      <Label htmlFor="ovo_number" className="text-xs sm:text-sm">OVO</Label>
-                      <Input
-                        id="ovo_number"
-                        value={formData.ovo_number}
-                        onChange={(e) => handleInputChange('ovo_number', e.target.value)}
-                        placeholder="08xx xxxx xxxx"
-                        className="h-9 sm:h-10 text-sm"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="dana_number" className="text-xs sm:text-sm">DANA</Label>
-                      <Input
-                        id="dana_number"
-                        value={formData.dana_number}
-                        onChange={(e) => handleInputChange('dana_number', e.target.value)}
-                        placeholder="08xx xxxx xxxx"
-                        className="h-9 sm:h-10 text-sm"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="shopeepay_number" className="text-xs sm:text-sm">ShopeePay</Label>
-                      <Input
-                        id="shopeepay_number"
-                        value={formData.shopeepay_number}
-                        onChange={(e) => handleInputChange('shopeepay_number', e.target.value)}
-                        placeholder="08xx xxxx xxxx"
-                        className="h-9 sm:h-10 text-sm"
-                      />
-                    </div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

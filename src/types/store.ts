@@ -20,11 +20,7 @@ export interface Store {
   bank_name?: string;
   bank_account_number?: string;
   bank_account_holder?: string;
-  ewallet_number?: string; // Legacy field, kept for backward compatibility
-  gopay_number?: string;
-  ovo_number?: string;
-  dana_number?: string;
-  shopeepay_number?: string;
+  qris_image_url?: string;
   whatsapp_number?: string;
   admin_password?: string;
   settings_password?: string;

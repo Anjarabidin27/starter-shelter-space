@@ -19,7 +19,7 @@ interface ReceiptProps {
 
 export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
   const { currentStore } = useStore();
-  const [paymentQrCode, setPaymentQrCode] = useState<string>('');
+  const [bankQrCode, setBankQrCode] = useState<string>('');
   
   const handleThermalPrint = useCallback(async () => {
     try {
@@ -68,12 +68,11 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
   }, [receipt, formatPrice, currentStore]);
 
 
-  // Generate QR Code for payment info
+  // Generate QR Code for bank transfer
   useEffect(() => {
-    const generatePaymentQR = async () => {
+    const generateBankQR = async () => {
       const paymentMethod = receipt.paymentMethod?.toLowerCase() || 'cash';
       
-      // Generate QR for transfer bank
       if (paymentMethod === 'transfer' && currentStore?.bank_account_number && currentStore?.bank_name) {
         const bankInfo = `Bank: ${currentStore.bank_name}\nNo. Rekening: ${currentStore.bank_account_number}\nAtas Nama: ${currentStore.bank_account_holder || '-'}`;
         try {
@@ -82,39 +81,16 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
             margin: 1,
             color: { dark: '#000000', light: '#FFFFFF' }
           });
-          setPaymentQrCode(url);
+          setBankQrCode(url);
         } catch (err) {
           console.error('Error generating bank QR code:', err);
         }
-      }
-      // Generate QR for e-wallet
-      else if (paymentMethod === 'ewallet') {
-        // Try to generate QR for available e-wallet
-        const ewallets = ['gopay', 'ovo', 'dana', 'shopeepay'];
-        for (const provider of ewallets) {
-          const phoneNumber = currentStore?.[`${provider}_number`];
-          if (phoneNumber) {
-            const cleanPhone = phoneNumber.replace(/\D/g, '');
-            const deepLink = `${provider}://pay?phone=${cleanPhone}`;
-            try {
-              const url = await QRCode.toDataURL(deepLink, {
-                width: 200,
-                margin: 1,
-                color: { dark: '#000000', light: '#FFFFFF' }
-              });
-              setPaymentQrCode(url);
-              break;
-            } catch (err) {
-              console.error(`Error generating ${provider} QR code:`, err);
-            }
-          }
-        }
       } else {
-        setPaymentQrCode('');
+        setBankQrCode('');
       }
     };
 
-    generatePaymentQR();
+    generateBankQR();
   }, [receipt.paymentMethod, currentStore]);
 
   // Add Enter key support for thermal printing
@@ -227,16 +203,34 @@ export const Receipt = ({ receipt, formatPrice, onBack }: ReceiptProps) => {
           </div>
 
           {/* Payment QR Code */}
-          {paymentQrCode && (
+          {bankQrCode && receipt.paymentMethod?.toLowerCase() === 'transfer' && (
             <div className="mt-4 pt-3 border-t">
               <div className="text-xs font-medium text-center mb-2 text-muted-foreground">
-                QR Code Pembayaran
+                QR Code Informasi Rekening
               </div>
               <div className="flex justify-center">
                 <img 
-                  src={paymentQrCode} 
-                  alt="QR Code Pembayaran"
+                  src={bankQrCode} 
+                  alt="QR Code Bank Transfer"
                   className="w-40 h-40 border-2 border-border rounded"
+                />
+              </div>
+              <div className="text-xs text-center text-muted-foreground italic mt-2">
+                Scan untuk info rekening transfer
+              </div>
+            </div>
+          )}
+          
+          {receipt.paymentMethod?.toLowerCase() === 'qris' && currentStore?.qris_image_url && (
+            <div className="mt-4 pt-3 border-t">
+              <div className="text-xs font-medium text-center mb-2 text-muted-foreground">
+                QRIS Pembayaran
+              </div>
+              <div className="flex justify-center">
+                <img 
+                  src={currentStore.qris_image_url} 
+                  alt="QRIS"
+                  className="w-48 h-48 object-contain border-2 border-border rounded"
                 />
               </div>
               <div className="text-xs text-center text-muted-foreground italic mt-2">
