@@ -136,23 +136,19 @@ export const StoreSettings = () => {
       const croppedPreview = URL.createObjectURL(croppedBlob);
       setQrisCroppedPreview(croppedPreview);
 
-      // Upload cropped image via Edge Function
-      const supabaseUrl = (supabase as any).rest?.url || "https://czopvrdqbuezueacfjyf.supabase.co";
-      const uploadEndpoint = `${supabaseUrl}/functions/v1/upload-qris`;
+      // Upload cropped image via Edge Function (use Supabase client to avoid 401 and wrong URL issues)
       const form = new FormData();
       form.append('file', croppedFile);
       form.append('storeId', currentStore.id);
 
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: Record<string, string> = {};
-      if (sessionData?.session?.access_token) {
-        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('upload-qris', {
+        body: form,
+      } as any);
+      if (fnError) {
+        throw new Error(fnError.message || 'Upload failed');
       }
-
-      const resp = await fetch(uploadEndpoint, { method: 'POST', headers, body: form });
-      if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
-      const json = await resp.json();
-      if (!json.publicUrl) throw new Error('publicUrl not returned');
+      const json = fnData as any;
+      if (!json?.publicUrl) throw new Error('publicUrl not returned');
 
       // Simpan URL ke database
       const publicUrl = json.publicUrl as string;
