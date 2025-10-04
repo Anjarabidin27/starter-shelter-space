@@ -42,7 +42,7 @@ export const formatThermalReceipt = (
 ${store.bank_name}
 No. Rek: ${store.bank_account_number || ''}
 a.n. ${store.bank_account_holder || ''}`
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
+    : receipt.paymentMethod?.toLowerCase() === 'qris'
     ? `\nQRIS: Lihat gambar QRIS di struk`
     : '';
 
@@ -132,7 +132,7 @@ export const formatMobileA4ThermalReceipt = (
     ? `\n\nTransfer ke: ${store.bank_name}
 No. Rekening: ${store.bank_account_number || ''}
 Atas Nama: ${store.bank_account_holder || ''}`
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
+    : receipt.paymentMethod?.toLowerCase() === 'qris'
     ? `\nQRIS: Lihat gambar QRIS di struk`
     : '';
 
@@ -216,7 +216,7 @@ export const formatPrintReceipt = (
           </div>
         </div>
       `
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
+    : receipt.paymentMethod?.toLowerCase() === 'qris'
     ? `
         <div style="border-top: 1px solid #e5e7eb; margin: 16px 0; padding-top: 16px;">
           <div style="font-size: 14px; color: #666; text-align: center;">
@@ -339,7 +339,7 @@ export const formatMobileA4PrintReceipt = (
           </div>
         </div>
       `
-    : receipt.paymentMethod?.toLowerCase() === 'qris' && store?.qris_image_url
+    : receipt.paymentMethod?.toLowerCase() === 'qris'
     ? `
         <div style="border-top: 2px solid #000; margin: 30px 0; padding-top: 20px; text-align: center;">
           <div style="font-size: 16px;">

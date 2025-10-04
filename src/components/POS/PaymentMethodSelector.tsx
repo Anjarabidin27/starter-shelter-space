@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQrisImage } from '@/hooks/useQrisImage';
 import { useStore } from '@/contexts/StoreContext';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -18,6 +19,7 @@ interface PaymentMethodSelectorProps {
 
 export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelectorProps) {
   const { currentStore } = useStore();
+  const { qrisUrl } = useQrisImage();
   const { toast } = useToast();
   const [qrCodeUrls, setQrCodeUrls] = useState<Record<EWalletProvider, string>>({
     gopay: '',
@@ -83,7 +85,7 @@ export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelector
   };
 
   const hasBankTransfer = currentStore?.bank_account_number && currentStore?.bank_name;
-  const hasQris = !!currentStore?.qris_image_url;
+  const hasQris = !!qrisUrl;
 
   return (
     <div className="space-y-3">
@@ -184,7 +186,7 @@ export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelector
             
             <div className="flex justify-center">
               <img 
-                src={currentStore?.qris_image_url} 
+                src={qrisUrl || ''} 
                 alt="QRIS Code"
                 className="max-w-[280px] w-full h-auto object-contain border-2 border-border rounded p-2 bg-white"
               />

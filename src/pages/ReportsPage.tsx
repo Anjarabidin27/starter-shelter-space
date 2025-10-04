@@ -68,25 +68,26 @@ export const ReportsPage = () => {
                 Kelola dan pantau riwayat transaksi Anda
               </p>
             </div>
-            <Link to="/">
-              <Button variant="outline" size="sm" className="flex items-center gap-2 w-full sm:w-auto">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="text-xs sm:text-sm">Kembali ke POS</span>
-              </Button>
-            </Link>
+            <div className="flex w-full sm:w-auto items-center gap-3">
+              <div className="relative flex-1 sm:w-80">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Cari invoice, produk, atau tanggal..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Link to="/">
+                <Button variant="outline" size="sm" className="flex items-center gap-2 w-auto">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span className="text-xs sm:text-sm">POS</span>
+                </Button>
+              </Link>
+            </div>
           </div>
 
-          {/* Search Box */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Cari invoice, produk, atau tanggal..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
 
           <div className="overflow-x-auto">
             <TransactionHistory

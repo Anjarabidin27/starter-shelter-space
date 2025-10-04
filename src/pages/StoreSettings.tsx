@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { StoreCategory, STORE_CATEGORIES } from '@/types/store';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AdminProtection } from '@/components/Auth/AdminProtection';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,6 +46,9 @@ export const StoreSettings = () => {
   const [showAdminProtection, setShowAdminProtection] = useState(true);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showSettingsPassword, setShowSettingsPassword] = useState(false);
+  const [uploadingQris, setUploadingQris] = useState(false);
+  const [qrisFullPreview, setQrisFullPreview] = useState<string>('');
+  const [qrisCroppedPreview, setQrisCroppedPreview] = useState<string>('');
 
   useEffect(() => {
     if (currentStore) {
@@ -85,7 +88,7 @@ export const StoreSettings = () => {
       bank_name: formData.bank_name,
       bank_account_number: formData.bank_account_number,
       bank_account_holder: formData.bank_account_holder,
-      qris_image_url: formData.qris_image_url,
+      // qris_image_url disimpan via storage & localStorage sementara
       whatsapp_number: formData.whatsapp_number,
       admin_password: formData.admin_password,
       settings_password: formData.settings_password,
@@ -103,6 +106,71 @@ export const StoreSettings = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleQrisUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentStore) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Error', description: 'File harus berupa gambar', variant: 'destructive' });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: 'Error', description: 'Ukuran file maksimal 5MB', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingQris(true);
+    try {
+      const { extractQrRegionAndEnhance } = await import('@/lib/image-utils');
+
+      // Preview full image locally
+      const fullUrl = URL.createObjectURL(file);
+      setQrisFullPreview(fullUrl);
+
+      // Extract QR only and enhance
+      const croppedBlob = await extractQrRegionAndEnhance(file);
+      const croppedFile = new File([croppedBlob], 'qris.png', { type: 'image/png' });
+      const croppedPreview = URL.createObjectURL(croppedBlob);
+      setQrisCroppedPreview(croppedPreview);
+
+      // Upload cropped image via Edge Function
+      const supabaseUrl = (supabase as any).rest?.url || "https://czopvrdqbuezueacfjyf.supabase.co";
+      const uploadEndpoint = `${supabaseUrl}/functions/v1/upload-qris`;
+      const form = new FormData();
+      form.append('file', croppedFile);
+      form.append('storeId', currentStore.id);
+
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: Record<string, string> = {};
+      if (sessionData?.session?.access_token) {
+        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+      }
+
+      const resp = await fetch(uploadEndpoint, { method: 'POST', headers, body: form });
+      if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
+      const json = await resp.json();
+      if (!json.publicUrl) throw new Error('publicUrl not returned');
+
+      // Persist only in localStorage for now (DB kolom belum ada)
+      localStorage.setItem(`qrisUrl:${currentStore.id}`, json.publicUrl as string);
+
+      toast({ title: 'Sukses', description: 'QRIS berhasil diupload dan diproses' });
+    } catch (err) {
+      console.error('QRIS upload error:', err);
+      toast({ title: 'Error', description: 'Gagal memproses/mengupload QRIS', variant: 'destructive' });
+    } finally {
+      setUploadingQris(false);
+    }
+  };
+
+  const handleRemoveQris = () => {
+    if (!currentStore) return;
+    localStorage.removeItem(`qrisUrl:${currentStore.id}`);
+    setQrisFullPreview('');
+    setQrisCroppedPreview('');
   };
 
   if (!currentStore) {
@@ -309,30 +377,45 @@ export const StoreSettings = () => {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="qris_image_url" className="text-xs sm:text-sm">URL Gambar QRIS</Label>
-                  <Input
-                    id="qris_image_url"
-                    value={formData.qris_image_url}
-                    onChange={(e) => handleInputChange('qris_image_url', e.target.value)}
-                    placeholder="https://example.com/qris.png atau paste URL gambar QRIS"
-                    className="h-9 sm:h-10 text-sm"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Masukkan URL gambar QRIS Anda. Gambar akan ditampilkan saat pembayaran QRIS.
+                <div className="space-y-3">
+                  <div className="text-sm font-medium">Kode QRIS</div>
+                  <p className="text-xs text-muted-foreground">
+                    Upload gambar QRIS (bisa foto struk/aplikasi). Sistem akan otomatis memotong dan menajamkan bagian QR saja.
                   </p>
-                  {formData.qris_image_url && (
-                    <div className="mt-2">
-                      <img 
-                        src={formData.qris_image_url} 
-                        alt="Preview QRIS" 
-                        className="max-w-[200px] w-full h-auto object-contain border rounded-lg p-2 bg-white"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
+
+                  <div>
+                    <Label htmlFor="qris_upload" className="cursor-pointer">
+                      <div className="border-2 border-dashed border-border rounded-lg p-6 hover:border-primary transition-colors text-center">
+                        <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                          {uploadingQris ? 'Memproses...' : 'Klik untuk upload gambar QRIS'}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">PNG/JPG maks 5MB</p>
+                      </div>
+                    </Label>
+                    <Input id="qris_upload" type="file" accept="image/*" onChange={handleQrisUpload} className="hidden" disabled={uploadingQris} />
+                  </div>
+
+                  {(qrisFullPreview || qrisCroppedPreview) && (
+                    <div className="grid grid-cols-2 gap-3">
+                      {qrisFullPreview && (
+                        <div>
+                          <div className="text-xs mb-1 text-muted-foreground">Gambar Asli</div>
+                          <img src={qrisFullPreview} alt="Asli" className="w-full h-auto object-contain border rounded-lg p-2 bg-white" />
+                        </div>
+                      )}
+                      {qrisCroppedPreview && (
+                        <div>
+                          <div className="text-xs mb-1 text-muted-foreground">Hanya QR (ditampilkan saat bayar)</div>
+                          <img src={qrisCroppedPreview} alt="QR saja" className="w-full h-auto object-contain border rounded-lg p-2 bg-white" />
+                        </div>
+                      )}
                     </div>
                   )}
+
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={handleRemoveQris} disabled={uploadingQris}>Hapus QRIS</Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

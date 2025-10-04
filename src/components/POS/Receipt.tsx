@@ -9,9 +9,34 @@ import { thermalPrinter } from '@/lib/thermal-printer';
 import { formatThermalReceipt, formatPrintReceipt } from '@/lib/receipt-formatter';
 import { toast } from 'sonner';
 import { useStore } from '@/contexts/StoreContext';
+import { useQrisImage } from '@/hooks/useQrisImage';
 import QRCode from 'qrcode';
 
+const QrisBlock = () => {
+  const { currentStore } = useStore();
+  const { qrisUrl } = useQrisImage();
+  if (!qrisUrl) return null;
+  return (
+    <div className="mt-4 pt-3 border-t">
+      <div className="text-xs font-medium text-center mb-2 text-muted-foreground">
+        QRIS Pembayaran
+      </div>
+      <div className="flex justify-center">
+        <img 
+          src={qrisUrl}
+          alt="QRIS"
+          className="w-48 h-48 object-contain border-2 border-border rounded bg-white"
+        />
+      </div>
+    </div>
+  );
+};
+
 interface ReceiptProps {
+  receipt: ReceiptType;
+  formatPrice: (price: number) => string;
+  onBack?: () => void;
+}
   receipt: ReceiptType;
   formatPrice: (price: number) => string;
   onBack?: () => void;
