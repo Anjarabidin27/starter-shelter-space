@@ -158,24 +158,36 @@ export const StoreSettings = () => {
     setUploadingQris(true);
 
     try {
-      // Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${currentStore.id}-qris-${Date.now()}.${fileExt}`;
-      const filePath = `qris/${fileName}`;
+      // Upload via Edge Function (handles bucket setup + upload)
+      const supabaseUrl = (supabase as any).rest?.url || "https://czopvrdqbuezueacfjyf.supabase.co";
+      const uploadEndpoint = `${supabaseUrl}/functions/v1/upload-qris`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('store-assets')
-        .upload(filePath, file, { upsert: true });
+      const form = new FormData();
+      form.append('file', file);
+      form.append('storeId', currentStore.id);
 
-      if (uploadError) throw uploadError;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers: Record<string, string> = { };
+      if (sessionData?.session?.access_token) {
+        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+      }
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('store-assets')
-        .getPublicUrl(filePath);
+      const resp = await fetch(uploadEndpoint, {
+        method: 'POST',
+        headers,
+        body: form,
+      });
 
-      // Update form data
-      handleInputChange('qris_image_url', publicUrl);
+      if (!resp.ok) {
+        throw new Error(`Upload function failed: ${resp.status}`);
+      }
+
+      const json = await resp.json();
+      if (!json.publicUrl) {
+        throw new Error('publicUrl not returned');
+      }
+
+      handleInputChange('qris_image_url', json.publicUrl as string);
 
       toast({
         title: 'Sukses',
