@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import { StoreCategory, STORE_CATEGORIES } from '@/types/store';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff, Upload, X } from 'lucide-react';
+import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AdminProtection } from '@/components/Auth/AdminProtection';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,7 +46,6 @@ export const StoreSettings = () => {
   const [showAdminProtection, setShowAdminProtection] = useState(true);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showSettingsPassword, setShowSettingsPassword] = useState(false);
-  const [uploadingQris, setUploadingQris] = useState(false);
 
   useEffect(() => {
     if (currentStore) {
@@ -104,107 +103,6 @@ export const StoreSettings = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleQrisUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !currentStore || !user) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: 'Error',
-        description: 'File harus berupa gambar',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: 'Error',
-        description: 'Ukuran file maksimal 5MB',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setUploadingQris(true);
-
-    try {
-      // Upload via Edge Function (handles bucket setup + upload)
-      const supabaseUrl = (supabase as any).rest?.url || "https://czopvrdqbuezueacfjyf.supabase.co";
-      const uploadEndpoint = `${supabaseUrl}/functions/v1/upload-qris`;
-
-      const form = new FormData();
-      form.append('file', file);
-      form.append('storeId', currentStore.id);
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      const headers: Record<string, string> = { };
-      if (sessionData?.session?.access_token) {
-        headers['Authorization'] = `Bearer ${sessionData.session.access_token}`;
-      }
-
-      const resp = await fetch(uploadEndpoint, {
-        method: 'POST',
-        headers,
-        body: form,
-      });
-
-      if (!resp.ok) {
-        throw new Error(`Upload function failed: ${resp.status}`);
-      }
-
-      const json = await resp.json();
-      if (!json.publicUrl) {
-        throw new Error('publicUrl not returned');
-      }
-
-      handleInputChange('qris_image_url', json.publicUrl as string);
-
-      toast({
-        title: 'Sukses',
-        description: 'Gambar QRIS berhasil diupload',
-      });
-    } catch (error) {
-      console.error('Error uploading QRIS:', error);
-      // Fallback: simpan sebagai Data URL (base64) di qris_image_url
-      try {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const result = reader.result as string;
-          if (result) {
-            handleInputChange('qris_image_url', result);
-            toast({
-              title: 'Berhasil (Mode Cadangan)',
-              description: 'QRIS disimpan tanpa cloud storage. Disarankan mengaktifkan penyimpanan agar lebih ringan.',
-            });
-          }
-        };
-        reader.onerror = () => {
-          toast({
-            title: 'Error',
-            description: 'Gagal membaca file QRIS',
-            variant: 'destructive',
-          });
-        };
-        reader.readAsDataURL(file);
-      } catch (e) {
-        toast({
-          title: 'Error',
-          description: 'Gagal mengupload gambar QRIS',
-          variant: 'destructive',
-        });
-      }
-    } finally {
-      setUploadingQris(false);
-    }
-  };
-
-  const handleRemoveQris = () => {
-    handleInputChange('qris_image_url', '');
   };
 
   if (!currentStore) {
@@ -411,54 +309,27 @@ export const StoreSettings = () => {
                   />
                 </div>
 
-                <div className="space-y-3">
-                  <div className="text-sm font-medium">Kode QRIS</div>
-                  <p className="text-xs text-muted-foreground">
-                    Upload gambar kode QRIS. Hanya kode QRIS yang akan ditampilkan saat pembayaran.
+                <div>
+                  <Label htmlFor="qris_image_url" className="text-xs sm:text-sm">URL Gambar QRIS</Label>
+                  <Input
+                    id="qris_image_url"
+                    value={formData.qris_image_url}
+                    onChange={(e) => handleInputChange('qris_image_url', e.target.value)}
+                    placeholder="https://example.com/qris.png atau paste URL gambar QRIS"
+                    className="h-9 sm:h-10 text-sm"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Masukkan URL gambar QRIS Anda. Gambar akan ditampilkan saat pembayaran QRIS.
                   </p>
-                  
-                  {formData.qris_image_url ? (
-                    <div className="space-y-2">
-                      <div className="relative inline-block">
-                        <img 
-                          src={formData.qris_image_url} 
-                          alt="Kode QRIS" 
-                          className="max-w-[200px] w-full h-auto object-contain border rounded-lg p-2 bg-white"
-                        />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                          onClick={handleRemoveQris}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <p className="text-xs text-muted-foreground italic">
-                        Kode QRIS berhasil diupload. Klik tombol Simpan untuk menyimpan ke database.
-                      </p>
-                    </div>
-                  ) : (
-                    <div>
-                      <Label htmlFor="qris_upload" className="cursor-pointer">
-                        <div className="border-2 border-dashed border-border rounded-lg p-6 hover:border-primary transition-colors text-center">
-                          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                          <p className="text-sm text-muted-foreground">
-                            {uploadingQris ? 'Mengupload...' : 'Klik untuk upload kode QRIS'}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            PNG, JPG, maksimal 5MB
-                          </p>
-                        </div>
-                      </Label>
-                      <Input
-                        id="qris_upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleQrisUpload}
-                        className="hidden"
-                        disabled={uploadingQris}
+                  {formData.qris_image_url && (
+                    <div className="mt-2">
+                      <img 
+                        src={formData.qris_image_url} 
+                        alt="Preview QRIS" 
+                        className="max-w-[200px] w-full h-auto object-contain border rounded-lg p-2 bg-white"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                       />
                     </div>
                   )}
