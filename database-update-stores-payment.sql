@@ -3,11 +3,17 @@
 -- Jalankan query ini di Supabase SQL Editor
 -- ========================================
 
--- Tambahkan field pembayaran ke tabel stores
+-- Tambahkan field pembayaran dan operasional ke tabel stores
 ALTER TABLE public.stores 
+ADD COLUMN IF NOT EXISTS opening_hours TEXT,
+ADD COLUMN IF NOT EXISTS closing_hours TEXT,
 ADD COLUMN IF NOT EXISTS bank_name TEXT,
 ADD COLUMN IF NOT EXISTS bank_account_number TEXT,
-ADD COLUMN IF NOT EXISTS bank_account_holder TEXT;
+ADD COLUMN IF NOT EXISTS bank_account_holder TEXT,
+ADD COLUMN IF NOT EXISTS qris_image_url TEXT,
+ADD COLUMN IF NOT EXISTS whatsapp_number TEXT,
+ADD COLUMN IF NOT EXISTS admin_password TEXT DEFAULT '122344566',
+ADD COLUMN IF NOT EXISTS settings_password TEXT DEFAULT '12234566';
 
 -- Catatan penting:
 -- - Gambar QRIS disimpan di Supabase Storage (bucket: store-assets, folder: qris/)
