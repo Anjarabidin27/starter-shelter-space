@@ -136,22 +136,52 @@ export const StoreSettings = () => {
       const croppedPreview = URL.createObjectURL(croppedBlob);
       setQrisCroppedPreview(croppedPreview);
 
-      // Upload cropped image via Edge Function (use Supabase client to avoid 401 and wrong URL issues)
+      // Upload cropped image via Edge Function (primary: multipart/form-data)
       const form = new FormData();
       form.append('file', croppedFile);
       form.append('storeId', currentStore.id);
 
-      const { data: fnData, error: fnError } = await supabase.functions.invoke('upload-qris', {
-        body: form,
-      } as any);
-      if (fnError) {
-        throw new Error(fnError.message || 'Upload failed');
+      let publicUrl: string | null = null;
+      try {
+        const { data: fnData, error: fnError } = await supabase.functions.invoke('upload-qris', {
+          body: form,
+        } as any);
+        if (fnError) throw fnError;
+        const json = fnData as any;
+        publicUrl = json?.publicUrl || null;
+      } catch (primaryErr) {
+        console.warn('Primary QRIS upload (multipart) failed, trying JSON fallback...', primaryErr);
       }
-      const json = fnData as any;
-      if (!json?.publicUrl) throw new Error('publicUrl not returned');
+
+      // Fallback: send as JSON base64 if multipart fails (works on some Android WebViews)
+      if (!publicUrl) {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1] || '');
+          };
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(croppedFile);
+        });
+
+        const { data: jsonData, error: jsonErr } = await supabase.functions.invoke('upload-qris', {
+          body: {
+            storeId: currentStore.id,
+            filename: 'qris.png',
+            mime: 'image/png',
+            file_base64: base64,
+          },
+        });
+        if (jsonErr) {
+          throw new Error(jsonErr.message || 'Upload failed');
+        }
+        publicUrl = (jsonData as any)?.publicUrl || null;
+      }
+
+      if (!publicUrl) throw new Error('publicUrl not returned');
 
       // Simpan URL ke database
-      const publicUrl = json.publicUrl as string;
       const { error: updateError } = await supabase
         .from('stores')
         .update({ qris_image_url: publicUrl } as any)
