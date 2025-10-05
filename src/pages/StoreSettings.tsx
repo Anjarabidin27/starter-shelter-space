@@ -19,6 +19,7 @@ import { ArrowLeft, Save, Store as StoreIcon, Eye, EyeOff, Upload } from 'lucide
 import { useNavigate } from 'react-router-dom';
 import { AdminProtection } from '@/components/Auth/AdminProtection';
 import { supabase } from '@/integrations/supabase/client';
+const BUCKET = 'store-assets';
 
 export const StoreSettings = () => {
   const { currentStore, updateStore } = useStore();
@@ -136,50 +137,16 @@ export const StoreSettings = () => {
       const croppedPreview = URL.createObjectURL(croppedBlob);
       setQrisCroppedPreview(croppedPreview);
 
-      // Upload cropped image via Edge Function (primary: multipart/form-data)
-      const form = new FormData();
-      form.append('file', croppedFile);
-      form.append('storeId', currentStore.id);
+      // Upload langsung ke Storage (tanpa Edge Function)
+      const path = `qris/${currentStore.id}-qris-${Date.now()}.png`;
+      const { error: uploadError } = await supabase.storage
+        .from(BUCKET)
+        .upload(path, croppedFile, { contentType: 'image/png', upsert: true });
+      if (uploadError) throw uploadError;
 
-      let publicUrl: string | null = null;
-      try {
-        const { data: fnData, error: fnError } = await supabase.functions.invoke('upload-qris', {
-          body: form,
-        } as any);
-        if (fnError) throw fnError;
-        const json = fnData as any;
-        publicUrl = json?.publicUrl || null;
-      } catch (primaryErr) {
-        console.warn('Primary QRIS upload (multipart) failed, trying JSON fallback...', primaryErr);
-      }
-
-      // Fallback: send as JSON base64 if multipart fails (works on some Android WebViews)
-      if (!publicUrl) {
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const result = reader.result as string;
-            resolve(result.split(',')[1] || '');
-          };
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(croppedFile);
-        });
-
-        const { data: jsonData, error: jsonErr } = await supabase.functions.invoke('upload-qris', {
-          body: {
-            storeId: currentStore.id,
-            filename: 'qris.png',
-            mime: 'image/png',
-            file_base64: base64,
-          },
-        });
-        if (jsonErr) {
-          throw new Error(jsonErr.message || 'Upload failed');
-        }
-        publicUrl = (jsonData as any)?.publicUrl || null;
-      }
-
-      if (!publicUrl) throw new Error('publicUrl not returned');
+      const { data: publicData } = supabase.storage.from(BUCKET).getPublicUrl(path);
+      const publicUrl = publicData?.publicUrl;
+      if (!publicUrl) throw new Error('Gagal mendapatkan publicUrl dari storage');
 
       // Simpan URL ke database
       const { error: updateError } = await supabase
