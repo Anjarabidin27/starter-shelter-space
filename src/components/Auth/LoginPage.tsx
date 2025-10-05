@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { toast as sonnerToast } from 'sonner';
 import { Store } from '@/types/store';
 
 export const LoginPage = () => {
@@ -64,9 +65,14 @@ export const LoginPage = () => {
     if (error) {
       setErrors(error.message || 'Pendaftaran gagal');
     } else {
-      toast({
-        title: 'Pendaftaran berhasil',
-        description: 'Silakan login dengan akun yang baru dibuat',
+      sonnerToast.success('Akun berhasil dibuat! Menunggu persetujuan admin.');
+      setErrors('');
+      // Clear form
+      setSignUpData({
+        email: '',
+        username: '',
+        password: '',
+        confirmPassword: ''
       });
     }
   };

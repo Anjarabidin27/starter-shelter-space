@@ -11,7 +11,7 @@ export type StoreCategory =
 export interface Store {
   id: string;
   name: string;
-  category: StoreCategory;
+  category: string;
   phone?: string;
   address?: string;
   cashier_name?: string;
@@ -24,6 +24,11 @@ export interface Store {
   whatsapp_number?: string;
   admin_password?: string;
   settings_password?: string;
+  dana_number?: string;
+  gopay_number?: string;
+  ovo_number?: string;
+  shopeepay_number?: string;
+  ewallet_number?: string;
   owner_id: string;
   created_at: string;
   updated_at: string;

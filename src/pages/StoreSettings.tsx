@@ -29,7 +29,7 @@ export const StoreSettings = () => {
   
   const [formData, setFormData] = useState({
     name: '',
-    category: 'sembako' as StoreCategory,
+    category: 'sembako',
     phone: '',
     address: '',
     cashier_name: '',
@@ -42,6 +42,11 @@ export const StoreSettings = () => {
     whatsapp_number: '',
     admin_password: '',
     settings_password: '',
+    dana_number: '',
+    gopay_number: '',
+    ovo_number: '',
+    shopeepay_number: '',
+    ewallet_number: '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [showAdminProtection, setShowAdminProtection] = useState(true);
@@ -59,15 +64,20 @@ export const StoreSettings = () => {
         phone: currentStore.phone || '',
         address: currentStore.address || '',
         cashier_name: currentStore.cashier_name || '',
-        opening_hours: (currentStore as any).opening_hours || '',
-        closing_hours: (currentStore as any).closing_hours || '',
-        bank_name: (currentStore as any).bank_name || '',
-        bank_account_number: (currentStore as any).bank_account_number || '',
-        bank_account_holder: (currentStore as any).bank_account_holder || '',
-        qris_image_url: (currentStore as any).qris_image_url || '',
-        whatsapp_number: (currentStore as any).whatsapp_number || '',
-        admin_password: (currentStore as any).admin_password || '122344566',
-        settings_password: (currentStore as any).settings_password || '12234566',
+        opening_hours: currentStore.opening_hours || '',
+        closing_hours: currentStore.closing_hours || '',
+        bank_name: currentStore.bank_name || '',
+        bank_account_number: currentStore.bank_account_number || '',
+        bank_account_holder: currentStore.bank_account_holder || '',
+        qris_image_url: currentStore.qris_image_url || '',
+        whatsapp_number: currentStore.whatsapp_number || '',
+        admin_password: currentStore.admin_password || '122344566',
+        settings_password: currentStore.settings_password || '12234566',
+        dana_number: currentStore.dana_number || '',
+        gopay_number: currentStore.gopay_number || '',
+        ovo_number: currentStore.ovo_number || '',
+        shopeepay_number: currentStore.shopeepay_number || '',
+        ewallet_number: currentStore.ewallet_number || '',
       });
     }
   }, [currentStore]);

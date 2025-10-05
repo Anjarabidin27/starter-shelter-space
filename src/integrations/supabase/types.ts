@@ -18,41 +18,44 @@ export type Database = {
         Row: {
           barcode: string | null
           category: string | null
+          code: string | null
           cost_price: number
-          created_at: string
+          created_at: string | null
           id: string
           is_photocopy: boolean | null
           name: string
           sell_price: number
-          stock: number
+          stock: number | null
           store_id: string | null
-          updated_at: string
+          updated_at: string | null
         }
         Insert: {
           barcode?: string | null
           category?: string | null
+          code?: string | null
           cost_price: number
-          created_at?: string
+          created_at?: string | null
           id?: string
           is_photocopy?: boolean | null
           name: string
           sell_price: number
-          stock?: number
+          stock?: number | null
           store_id?: string | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Update: {
           barcode?: string | null
           category?: string | null
+          code?: string | null
           cost_price?: number
-          created_at?: string
+          created_at?: string | null
           id?: string
           is_photocopy?: boolean | null
           name?: string
           sell_price?: number
-          stock?: number
+          stock?: number | null
           store_id?: string | null
-          updated_at?: string
+          updated_at?: string | null
         }
         Relationships: [
           {
@@ -67,27 +70,36 @@ export type Database = {
       profiles: {
         Row: {
           admin_password: string | null
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           email: string
           id: string
+          is_approved: boolean | null
           updated_at: string
           user_id: string
           username: string
         }
         Insert: {
           admin_password?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           email: string
           id?: string
+          is_approved?: boolean | null
           updated_at?: string
           user_id: string
           username: string
         }
         Update: {
           admin_password?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           email?: string
           id?: string
+          is_approved?: boolean | null
           updated_at?: string
           user_id?: string
           username?: string
@@ -97,11 +109,11 @@ export type Database = {
       receipt_items: {
         Row: {
           cost_price: number | null
-          created_at: string
+          created_at: string | null
           final_price: number | null
           id: string
           product_id: string | null
-          product_name: string | null
+          product_name: string
           profit: number | null
           quantity: number
           receipt_id: string
@@ -110,11 +122,11 @@ export type Database = {
         }
         Insert: {
           cost_price?: number | null
-          created_at?: string
+          created_at?: string | null
           final_price?: number | null
           id?: string
           product_id?: string | null
-          product_name?: string | null
+          product_name: string
           profit?: number | null
           quantity: number
           receipt_id: string
@@ -123,11 +135,11 @@ export type Database = {
         }
         Update: {
           cost_price?: number | null
-          created_at?: string
+          created_at?: string | null
           final_price?: number | null
           id?: string
           product_id?: string | null
-          product_name?: string | null
+          product_name?: string
           profit?: number | null
           quantity?: number
           receipt_id?: string
@@ -153,7 +165,7 @@ export type Database = {
       }
       receipts: {
         Row: {
-          created_at: string
+          created_at: string | null
           discount: number | null
           id: string
           invoice_number: string | null
@@ -165,7 +177,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           discount?: number | null
           id: string
           invoice_number?: string | null
@@ -177,7 +189,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           discount?: number | null
           id?: string
           invoice_number?: string | null
@@ -200,42 +212,42 @@ export type Database = {
       }
       shopping_items: {
         Row: {
-          created_at: string
+          created_at: string | null
           current_stock: number | null
           id: string
-          is_completed: boolean
+          is_completed: boolean | null
           name: string
           notes: string | null
           quantity: number | null
           store_id: string | null
           unit: string | null
-          updated_at: string
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          created_at?: string
+          created_at?: string | null
           current_stock?: number | null
           id?: string
-          is_completed?: boolean
+          is_completed?: boolean | null
           name: string
           notes?: string | null
           quantity?: number | null
           store_id?: string | null
           unit?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          created_at?: string
+          created_at?: string | null
           current_stock?: number | null
           id?: string
-          is_completed?: boolean
+          is_completed?: boolean | null
           name?: string
           notes?: string | null
           quantity?: number | null
           store_id?: string | null
           unit?: string | null
-          updated_at?: string
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -256,9 +268,9 @@ export type Database = {
           bank_account_number: string | null
           bank_name: string | null
           cashier_name: string | null
-          category: Database["public"]["Enums"]["store_category"]
+          category: string
           closing_hours: string | null
-          created_at: string
+          created_at: string | null
           dana_number: string | null
           ewallet_number: string | null
           gopay_number: string | null
@@ -268,9 +280,10 @@ export type Database = {
           ovo_number: string | null
           owner_id: string
           phone: string | null
+          qris_image_url: string | null
           settings_password: string | null
           shopeepay_number: string | null
-          updated_at: string
+          updated_at: string | null
           whatsapp_number: string | null
         }
         Insert: {
@@ -280,9 +293,9 @@ export type Database = {
           bank_account_number?: string | null
           bank_name?: string | null
           cashier_name?: string | null
-          category: Database["public"]["Enums"]["store_category"]
+          category: string
           closing_hours?: string | null
-          created_at?: string
+          created_at?: string | null
           dana_number?: string | null
           ewallet_number?: string | null
           gopay_number?: string | null
@@ -292,9 +305,10 @@ export type Database = {
           ovo_number?: string | null
           owner_id: string
           phone?: string | null
+          qris_image_url?: string | null
           settings_password?: string | null
           shopeepay_number?: string | null
-          updated_at?: string
+          updated_at?: string | null
           whatsapp_number?: string | null
         }
         Update: {
@@ -304,9 +318,9 @@ export type Database = {
           bank_account_number?: string | null
           bank_name?: string | null
           cashier_name?: string | null
-          category?: Database["public"]["Enums"]["store_category"]
+          category?: string
           closing_hours?: string | null
-          created_at?: string
+          created_at?: string | null
           dana_number?: string | null
           ewallet_number?: string | null
           gopay_number?: string | null
@@ -316,10 +330,32 @@ export type Database = {
           ovo_number?: string | null
           owner_id?: string
           phone?: string | null
+          qris_image_url?: string | null
           settings_password?: string | null
           shopeepay_number?: string | null
-          updated_at?: string
+          updated_at?: string | null
           whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -335,8 +371,16 @@ export type Database = {
           username: string
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "user"
       store_category:
         | "sembako"
         | "bangunan"
@@ -473,6 +517,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "user"],
       store_category: [
         "sembako",
         "bangunan",

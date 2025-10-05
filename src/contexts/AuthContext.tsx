@@ -11,6 +11,8 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   verifyAdminPassword: (password: string) => Promise<boolean>;
   loading: boolean;
+  isApproved: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,6 +21,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isApproved, setIsApproved] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -26,6 +30,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
+        
+        // Check approval status and role
+        if (session?.user) {
+          setTimeout(() => {
+            checkUserApprovalAndRole(session.user.id);
+          }, 0);
+        } else {
+          setIsApproved(false);
+          setIsAdmin(false);
+        }
         setLoading(false);
       }
     );
@@ -34,16 +48,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        checkUserApprovalAndRole(session.user.id);
+      }
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  const checkUserApprovalAndRole = async (userId: string) => {
+    try {
+      // Check profile approval status
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_approved')
+        .eq('user_id', userId)
+        .single();
+      
+      setIsApproved(profile?.is_approved ?? false);
+
+      // Check if user is admin
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      setIsAdmin(!!roles);
+    } catch (error) {
+      console.error('Error checking user status:', error);
+      setIsApproved(false);
+      setIsAdmin(false);
+    }
+  };
+
   const signUp = async (email: string, username: string, password: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -53,14 +98,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     });
+    
+    // Notify admin about new registration
+    if (!error && data.user) {
+      try {
+        await supabase.functions.invoke('notify-admin-new-user', {
+          body: {
+            userEmail: email,
+            username: username,
+          },
+        });
+      } catch (notifyError) {
+        console.error('Failed to notify admin:', notifyError);
+        // Don't block signup if notification fails
+      }
+    }
+    
     return { error };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    
+    if (error) return { error };
+    
+    // Check if user is approved
+    if (data.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_approved')
+        .eq('user_id', data.user.id)
+        .single();
+      
+      if (!profile?.is_approved) {
+        await supabase.auth.signOut();
+        return { error: { message: 'Akun Anda masih menunggu persetujuan admin' } };
+      }
+    }
+    
     return { error };
   };
 
@@ -124,6 +202,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     signOut,
     verifyAdminPassword,
     loading,
+    isApproved,
+    isAdmin,
   };
 
   return (

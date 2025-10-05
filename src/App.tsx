@@ -14,6 +14,8 @@ import { StoreProvider } from "@/contexts/StoreContext";
 import { BluetoothProvider } from "@/contexts/BluetoothContext";
 import { LoginPage } from "@/components/Auth/LoginPage";
 import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
+import { AdminRoute } from "@/components/Auth/AdminRoute";
+import { UserManagement } from "@/components/Admin/UserManagement";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Create QueryClient outside component to prevent recreation on every render
@@ -49,17 +51,22 @@ const App = () => {
                           <CartView />
                         </ProtectedRoute>
                       } />
-                      <Route path="/reports" element={
-                        <ProtectedRoute>
-                          <ReportsPage />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/settings" element={
-                        <ProtectedRoute>
-                          <StoreSettings />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="*" element={<NotFound />} />
+          <Route path="/reports" element={
+            <ProtectedRoute>
+              <ReportsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/settings" element={
+            <ProtectedRoute>
+              <StoreSettings />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/users" element={
+            <AdminRoute>
+              <UserManagement />
+            </AdminRoute>
+          } />
+          <Route path="*" element={<NotFound />} />
                     </Routes>
                   </BluetoothProvider>
                 </POSProvider>
