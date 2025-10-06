@@ -7,6 +7,7 @@ import { POSInterface } from "@/components/POS/POSInterface";
 import { CartView } from "./pages/CartView";
 import { ReportsPage } from "./pages/ReportsPage";
 import { StoreSettings } from "./pages/StoreSettings";
+import { Dashboard } from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import { POSProvider } from "@/contexts/POSContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -42,6 +43,11 @@ const App = () => {
                     <Routes>
                       <Route path="/login" element={<LoginPage />} />
                       <Route path="/" element={
+                        <ProtectedRoute>
+                          <Dashboard />
+                        </ProtectedRoute>
+                      } />
+                      <Route path="/pos" element={
                         <ProtectedRoute>
                           <POSInterface />
                         </ProtectedRoute>

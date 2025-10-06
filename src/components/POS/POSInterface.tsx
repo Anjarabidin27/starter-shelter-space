@@ -497,12 +497,6 @@ Profit: ${formatPrice(receipt.profit)}
                 <Suspense fallback={<div className="h-8 w-8"></div>}>
                   <LazyBluetoothManager />
                 </Suspense>
-                <Link to="/admin/users">
-                  <Button variant="outline" size="sm">
-                    <Users className="h-4 w-4 mr-2" />
-                    Admin
-                  </Button>
-                </Link>
                 
                 {/* Thermal Print Status */}
                 {(lastReceipt || selectedReceipt) && (
