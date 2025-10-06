@@ -34,7 +34,7 @@ export const LazyReceipt = lazy(() =>
 );
 
 export const LazyAddProductForm = lazy(() => 
-  retryImport(() => import('../POS/AddProductForm').then(module => ({ default: module.AddProductForm })))
+  retryImport(() => import('../POS/AddProductForm'))
 );
 
 export const LazySalesReport = lazy(() => 

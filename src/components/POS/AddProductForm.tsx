@@ -20,7 +20,7 @@ interface AddProductFormProps {
   onClose: () => void;
 }
 
-export function AddProductForm({ onAddProduct, onUpdateProduct, products = [], onClose }: AddProductFormProps) {
+export default function AddProductForm({ onAddProduct, onUpdateProduct, products = [], onClose }: AddProductFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     costPrice: '',
